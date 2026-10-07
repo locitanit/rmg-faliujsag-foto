@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.pem
+*.key
+credentials.json
+token.json
+client_secret*.json

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client; frame-src https://accounts.google.com/gsi/; connect-src 'self' https://accounts.google.com/gsi/ https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:"
+    />
+    <meta name="theme-color" content="#1d4f91" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Faliújság – fotózó</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>Faliújság – fotózó</h1>
+
+      <p id="setup" class="box warn" hidden>
+        Az alkalmazás még nincs beállítva (hiányzik a <code>config.js</code> két értéke).
+      </p>
+
+      <section class="box hint">
+        <b>Így fotózz:</b>
+        <ul>
+          <li>Egy fotó = <b>egy ajtó</b> (vagy a parafatábla egy része), közelről.</li>
+          <li>A képen mindig látsszon <b>legalább 4 matrica</b>.</li>
+          <li>A végén nyomd meg a <b>Kész</b> gombot.</li>
+        </ul>
+      </section>
+
+      <button id="signin" class="secondary" hidden>Belépés az iskolai Google-fiókkal</button>
+
+      <label id="shoot" class="primary">
+        📷 Fotó
+        <input id="camera" type="file" accept="image/*" capture="environment" hidden />
+      </label>
+
+      <p id="counts" class="counts"></p>
+
+      <button id="done" class="secondary" disabled>Kész – nincs több fotó</button>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+
+      <details>
+        <summary>Hogyan kerül a kezdőképernyőre?</summary>
+        <p><b>iPhone (Safari):</b> Megosztás gomb → „Főképernyőhöz adás”.</p>
+        <p><b>Android (Chrome):</b> ⋮ menü → „Hozzáadás a kezdőképernyőhöz”.</p>
+      </details>
+
+      <p class="small">
+        A fotó nem kerül a telefon galériájába. Feltöltés után a telefonról is törlődik; csak az
+        iskolai Google Drive-ra megy.
+      </p>
+    </main>
+  </body>
+</html>

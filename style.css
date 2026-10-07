@@ -1,0 +1,140 @@
+:root {
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --text: #1b2430;
+  --muted: #5b6675;
+  --primary: #1d4f91;
+  --on-primary: #ffffff;
+  --border: #d5dbe3;
+  --warn-bg: #fff4d6;
+  --ok: #1e7b3c;
+  --bad: #b3261e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161c;
+    --card: #1c222b;
+    --text: #e8ecf1;
+    --muted: #9aa5b3;
+    --primary: #6ea8ff;
+    --on-primary: #0b1420;
+    --border: #2e3744;
+    --warn-bg: #3d3212;
+    --ok: #6fd08c;
+    --bad: #ff8a80;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 16px calc(24px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 4px 0 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.box {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.box ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.warn {
+  background: var(--warn-bg);
+}
+
+button,
+.primary {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.primary {
+  display: block;
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+  font-size: 26px;
+  padding: 30px 14px;
+  user-select: none;
+}
+
+.secondary {
+  background: var(--card);
+  color: var(--text);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.counts {
+  margin: 0;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  margin: 0;
+  min-height: 1.5em;
+  text-align: center;
+  color: var(--muted);
+}
+
+.status.ok {
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.status.bad {
+  color: var(--bad);
+}
+
+details,
+.small {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.small {
+  margin: 0;
+}
+
+code {
+  font-size: 0.9em;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "rmg-faliujsag-foto",
+  "private": true,
+  "type": "module",
+  "description": "Faliújság-fotózó webapp: fotók a telefonról a közös meghajtó beküldő mappájába.",
+  "scripts": {
+    "test": "node --test"
+  }
+}
