@@ -88,9 +88,8 @@ function renderWall(marks, emptyDoors) {
       const look = isEmpty ? " empty" : top && bottom ? " have" : top ? " top" : bottom ? " bottom" : "";
       chip.className = `chip${look}`;
       const number = String(index + 1);
-      chip.textContent = isEmpty
-        ? `${number} üres`
-        : top && bottom ? `✓ ${number}` : top ? `${number} ▲` : bottom ? `${number} ▼` : number;
+      // Only the number, in every state: the look says the rest, and the chip never grows.
+      chip.textContent = number;
       const state = isEmpty
         ? "üresnek jelölve"
         : top && bottom ? "megvan" : top ? "csak a teteje van meg" : bottom ? "csak az alja van meg" : "nincs meg";
@@ -111,7 +110,6 @@ function renderWall(marks, emptyDoors) {
   const halves = half ? ` (+ ${half} félig)` : "";
   const all = whole === ITEM_COUNT ? " – minden megvan ✓" : "";
   $("wall-title").textContent = `Ma megvan: ${whole} / ${ITEM_COUNT}${halves}${all}`;
-  $("wall-legend").hidden = half === 0;
 }
 
 async function toggleEmpty(item, photographed, isEmpty) {
@@ -182,9 +180,16 @@ function say(text, kind = "") {
 
 async function render() {
   const status = await rounds.status();
+  // Signed out: the sign-in box and nothing else. Signed in: the icons and the photo screen.
+  const signedIn = configured && auth.signedIn();
   $("setup").hidden = configured;
-  $("signin-box").hidden = !configured || auth.signedIn();
-  $("signout").hidden = !redirectMode || !auth.signedIn();
+  $("signin-box").hidden = !configured || signedIn;
+  $("app-view").hidden = !signedIn;
+  $("actions").hidden = !signedIn;
+  if (!signedIn) {
+    closeProfileMenu();
+    if ($("install-dialog").open) $("install-dialog").close();
+  }
   renderWall(status.marks, status.empty);
   $("counts").textContent = status.waiting
     ? `${status.waiting} fotó vár feltöltésre a telefonon`
@@ -269,10 +274,60 @@ document.addEventListener(
   }),
 );
 
+// The top bar: instructions (shown until switched off; this phone remembers), the
+// home-screen tip, and the account menu with "Kijelentkezés".
+const HELP_KEY = "faliujsag-foto.help";
+
+function showHelp(open) {
+  $("help").hidden = !open;
+  $("help-button").setAttribute("aria-expanded", String(open));
+}
+
+function closeProfileMenu() {
+  $("profile-menu").hidden = true;
+  $("profile-button").setAttribute("aria-expanded", "false");
+}
+
+$("help-button").addEventListener("click", () => {
+  const open = $("help").hidden;
+  showHelp(open);
+  try {
+    localStorage.setItem(HELP_KEY, open ? "on" : "off");
+  } catch {
+    // private mode: open again next time, nothing else is lost
+  }
+  if (open) $("help").scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+
+$("install-button").addEventListener("click", () => {
+  closeProfileMenu();
+  $("install-dialog").showModal();
+});
+$("install-close").addEventListener("click", () => $("install-dialog").close());
+$("install-dialog").addEventListener("click", (event) => {
+  if (event.target === $("install-dialog")) $("install-dialog").close(); // a tap beside it
+});
+
+$("profile-button").addEventListener("click", () => {
+  const open = $("profile-menu").hidden;
+  $("profile-account").textContent = savedHint() || "Iskolai Google-fiók";
+  $("profile-menu").hidden = !open;
+  $("profile-button").setAttribute("aria-expanded", String(open));
+});
+document.addEventListener("click", (event) => {
+  if (!event.target.closest("#profile-menu, #profile-button")) closeProfileMenu();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeProfileMenu();
+});
+
 $("signout").addEventListener(
   "click",
   guard(async () => {
-    auth.signOut();
+    closeProfileMenu();
+    // The pop-up sign-in keeps its token in memory only: forgetting it is the sign-out.
+    if (auth.signOut) auth.signOut();
+    else auth.forget();
     say("Kijelentkeztél. A fotók addig a telefonon várnak, amíg újra be nem lépsz.");
     await render();
   }),
@@ -290,6 +345,11 @@ if ("serviceWorker" in navigator) {
 }
 
 $("hint").value = savedHint();
+try {
+  showHelp(localStorage.getItem(HELP_KEY) !== "off");
+} catch {
+  showHelp(true);
+}
 
 guard(async () => {
   // Back from Google? Or opened after days? Either way: signed in before anything else.

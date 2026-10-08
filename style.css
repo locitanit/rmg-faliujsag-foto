@@ -1,29 +1,20 @@
+/* The look follows the dark mode of RMG Tools (Material UI dark palette, green primary). */
 :root {
-  --bg: #f4f6f9;
-  --card: #ffffff;
-  --text: #1b2430;
-  --muted: #5b6675;
-  --primary: #1d4f91;
-  --on-primary: #ffffff;
-  --border: #d5dbe3;
-  --warn-bg: #fff4d6;
-  --ok: #1e7b3c;
-  --bad: #b3261e;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #12161c;
-    --card: #1c222b;
-    --text: #e8ecf1;
-    --muted: #9aa5b3;
-    --primary: #6ea8ff;
-    --on-primary: #0b1420;
-    --border: #2e3744;
-    --warn-bg: #3d3212;
-    --ok: #6fd08c;
-    --bad: #ff8a80;
-  }
+  color-scheme: dark;
+  --bg: #121212;
+  --card: #1e1e1e;
+  --bar: #272727;
+  --raised: #2f2f2f;
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.7);
+  --primary: #66bb6a;
+  --on-primary: rgba(0, 0, 0, 0.87);
+  --border: rgba(255, 255, 255, 0.12);
+  --hover: rgba(255, 255, 255, 0.08);
+  --warn: #ffa726;
+  --warn-bg: rgba(255, 167, 38, 0.14);
+  --ok: #66bb6a;
+  --bad: #f6685e;
 }
 
 * {
@@ -34,21 +25,47 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 16px/1.5 "Noto Sans", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+}
+
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: calc(56px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 8px 0 16px;
+  background: var(--bar);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions {
+  display: flex;
+}
+
+main,
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 main {
   max-width: 480px;
   margin: 0 auto;
   padding: 16px 16px calc(24px + env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-h1 {
-  font-size: 22px;
-  margin: 4px 0 0;
 }
 
 [hidden] {
@@ -57,53 +74,102 @@ h1 {
 
 .box {
   margin: 0;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
-.box ul {
+.box ul,
+.box ol {
   margin: 6px 0 0;
-  padding-left: 20px;
+  padding-left: 22px;
+}
+
+.box li + li {
+  margin-top: 6px;
 }
 
 .warn {
   background: var(--warn-bg);
+  border-color: var(--warn);
 }
 
 button,
 .primary {
   font: inherit;
-  font-weight: 600;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  padding: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  padding: 12px 14px;
   text-align: center;
   cursor: pointer;
 }
 
-.primary {
-  display: block;
+.primary,
+.contained {
   background: var(--primary);
   color: var(--on-primary);
-  border-color: var(--primary);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+}
+
+.primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   font-size: 26px;
-  padding: 30px 14px;
+  padding: 28px 14px;
+  border-radius: 8px;
   user-select: none;
 }
 
-.secondary {
-  background: var(--card);
+.primary svg {
+  width: 34px;
+  height: 34px;
+  fill: currentColor;
+}
+
+.outlined {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.text-button {
+  background: transparent;
+  color: var(--primary);
+  padding: 8px 12px;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
   color: var(--text);
 }
 
-.small-button {
-  align-self: center;
-  font-size: 14px;
-  font-weight: 400;
-  padding: 8px 16px;
-  color: var(--muted);
+.icon-button svg,
+.menu-item svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.icon-button:active,
+.icon-button[aria-expanded="true"] {
+  background: var(--hover);
+}
+
+/* The instructions are open: their icon is lit. */
+#help-button[aria-expanded="true"] {
+  background: transparent;
+  color: var(--primary);
 }
 
 button:disabled {
@@ -111,20 +177,94 @@ button:disabled {
   cursor: default;
 }
 
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 8px;
+  min-width: 220px;
+  max-width: calc(100vw - 16px);
+  padding: 8px 0;
+  background: var(--raised);
+  border-radius: 4px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.6);
+}
+
+.menu-label {
+  margin: 0;
+  padding: 6px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  font-weight: 400;
+  text-align: left;
+}
+
+.menu-item:active {
+  background: var(--hover);
+}
+
+.dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 20px 20px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--raised);
+  color: var(--text);
+  box-shadow: 0 11px 30px rgba(0, 0, 0, 0.7);
+}
+
+.dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.dialog > b {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.dialog p {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
 #signin-box {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 #hint {
   font: inherit;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.23);
+  border-radius: 4px;
+  background: transparent;
   color: var(--text);
   width: 100%;
+}
+
+#hint:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
 }
 
 .row {
@@ -156,40 +296,30 @@ button:disabled {
   margin-top: 2px;
 }
 
-.chip {
-  min-width: 38px;
-  padding: 5px 8px;
+/* Every state has the same size: a tap must never push the other chips around. */
+.chip,
+button.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  padding: 0;
   border: 1px solid var(--border);
-  border-radius: 9px;
-  text-align: center;
-  font-size: 14px;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
 
 .chip.have {
   background: var(--ok);
   border-color: var(--ok);
-  color: var(--card);
+  color: var(--on-primary);
   font-weight: 600;
-}
-
-button.chip {
-  font: inherit;
-  font-size: 14px;
-  font-weight: 400;
-  background: transparent;
-  cursor: pointer;
-}
-
-.chip.empty {
-  background: var(--muted);
-  border-color: var(--muted);
-  color: var(--card);
-  font-weight: 600;
-}
-
-.tip {
-  margin-top: 8px;
 }
 
 .chip.top,
@@ -200,21 +330,50 @@ button.chip {
 }
 
 .chip.top {
-  background: linear-gradient(to bottom, var(--ok) 50%, transparent 50%);
+  background: linear-gradient(to bottom, rgba(102, 187, 106, 0.75) 50%, transparent 50%);
 }
 
 .chip.bottom {
-  background: linear-gradient(to top, var(--ok) 50%, transparent 50%);
+  background: linear-gradient(to top, rgba(102, 187, 106, 0.75) 50%, transparent 50%);
 }
 
-#wall-legend {
-  margin-top: 8px;
+/* "Empty": dashed frame and a slash across – no extra text, so the size stays. */
+.chip.empty {
+  border: 2px dashed var(--muted);
+  color: var(--muted);
+  background: linear-gradient(
+    to top right,
+    transparent calc(50% - 1px),
+    var(--muted) calc(50% - 1px),
+    var(--muted) calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
 }
 
-button.ready {
-  background: var(--ok);
-  border-color: var(--ok);
-  color: var(--card);
+.box .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.chip.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.chip.swatch.empty {
+  border-width: 1px;
 }
 
 .counts {
@@ -223,7 +382,8 @@ button.ready {
   font-variant-numeric: tabular-nums;
 }
 
-.status:empty {
+.status:empty,
+.counts:empty {
   display: none;
 }
 
@@ -242,14 +402,10 @@ button.ready {
   color: var(--bad);
 }
 
-details,
-.small {
-  color: var(--muted);
-  font-size: 14px;
-}
-
 .small {
   margin: 0;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 code {

@@ -2,7 +2,7 @@
 // then wait in the local queue). Network first – a new version shows up at once; the
 // cached copy is only the fallback. Nothing from Google is ever cached.
 
-const CACHE = "faliujsag-foto-v8";
+const CACHE = "faliujsag-foto-v9";
 const SHELL = [
   "./",
   "index.html",

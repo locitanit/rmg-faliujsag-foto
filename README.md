@@ -18,6 +18,10 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
 
 ## Mit tud
 
+- **Képernyő:** sötét, az RMG Tools sötét módjának színeivel. Belépés előtt csak a belépő
+  doboz látszik; belépés után a leírás, a Fotó gomb és a pipalista. Fent három ikon:
+  **?** (a leírás ki-be; a telefon megjegyzi), **telefon** (tipp a kezdőképernyőre tételhez),
+  **fiók** (felugró menü, benne a Kijelentkezés).
 - Belépés iskolai Google-fiókkal (Google Identity Services; a token csak a memóriában él).
 - **Mindig a jó fiókkal:** a belépés előtt beírható az iskolai e-mail cím. Csak a telefon
   jegyzi meg (`localStorage`), és a Google-nek `login_hint`-ként megy: a fiókválasztó
@@ -42,10 +46,11 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
 - **Pipalista:** a fal 17 része (12 ajtó + a két tábla 3 + 2 része); a pipák **egész nap** megmaradnak
   (a körök közben a háttérben lezárulnak), másnap tiszta lappal indul.
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó
-  **teteje** (▲, a csempe felül zöld); alsó + középső = az **alja** (▼). A kettő együtt (vagy
+  **teteje** (a csempe felül zöld); alsó + középső = az **alja** (alul zöld). A kettő együtt (vagy
   egy egész-ajtós fotó) adja a pipát. A parafatábla része mindig egészben számít.
 - **Üres ajtó fotó nélkül:** ha egy szekrényajtóról minden lekerült, a listán a számára
-  koppintva „üres"-nek jelölhető (még egy koppintás visszavonja). A feldolgozó ilyenkor az
+  koppintva „üres"-nek jelölhető (még egy koppintás visszavonja). A csempe mérete nem
+  változik: szaggatott keretet és áthúzást kap. A feldolgozó ilyenkor az
   ajtó papírjait fotó nélkül „lekerült"-re állítja. Ha ugyanarról az ajtóról fotó is készül
   a körben, a fotó számít. Parafatáblán nincs ilyen.
 - A kör végén `done.json` megy a kör mappájába: darabszám, időpont, és az üresnek jelölt
