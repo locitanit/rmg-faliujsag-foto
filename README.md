@@ -11,6 +11,10 @@ Nincs szerver, nincs build: sima statikus fájlok (GitHub Pages-re való).
 feltöltés élő fiókkal kipróbálva (gépről és telefonról). A fotó-ellenőrzés telefonon, valódi ajtón
 kipróbálva (2026-10-08: egész ajtó és két fél fotó – az 1. ajtón, mert csak azon van
 matrica). A „túl messze" és az „életlen" küszöb még becslés; parafatáblán nem volt próba.
+Az átirányításos belépés (lent) 2026-10-08 este lett bekapcsolva – **élő fiókkal még nincs
+visszaigazolva**; ha gond van vele, a `config.js`-ben `redirectSignIn: false` visszaadja a
+felugró ablakos belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-terv.md`,
+„ITT KEZDD" → „Hol tartunk".
 
 ## Mit tud
 
@@ -116,9 +120,9 @@ python -m http.server 8765
 
 ## Belépés gomb nélkül (átirányításos belépés)
 
-Alapból a belépés felugró ablakkal megy: óránként egy koppintás a „Belépés" gombra (a
-böngésző csak koppintásra enged felugró ablakot nyitni). A `config.js` `redirectSignIn: true`
-értékével a belépés **átirányítással** megy: az oldal maga megy át a Google-höz és jön vissza
+**Bekapcsolva (2026-10-08).** `redirectSignIn: false` mellett a belépés felugró ablakkal megy:
+óránként egy koppintás a „Belépés" gombra (a böngésző csak koppintásra enged felugró ablakot
+nyitni). A `config.js` `redirectSignIn: true` értékével a belépés **átirányítással** megy: az oldal maga megy át a Google-höz és jön vissza
 – ehhez nem kell koppintás, ezért az app megnyitáskor (és ha menet közben lejár a belépés)
 **magától belép**. Belépni így telefononként egyszer kell; utána csak akkor, ha valaki a
 „Kijelentkezés"-re nyom, vagy a Google-fiókból kilép a böngészőben.
