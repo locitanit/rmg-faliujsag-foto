@@ -11,9 +11,9 @@ Nincs szerver, nincs build: sima statikus fájlok (GitHub Pages-re való).
 feltöltés élő fiókkal kipróbálva (gépről és telefonról). A fotó-ellenőrzés telefonon, valódi ajtón
 kipróbálva (2026-10-08: egész ajtó és két fél fotó – az 1. ajtón, mert csak azon van
 matrica). A „túl messze" és az „életlen" küszöb még becslés; parafatáblán nem volt próba.
-Az átirányításos belépés (lent) 2026-10-08 este lett bekapcsolva – **élő fiókkal még nincs
-visszaigazolva**; ha gond van vele, a `config.js`-ben `redirectSignIn: false` visszaadja a
-felugró ablakos belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-terv.md`,
+Az átirányításos belépés (lent) 2026-10-08 este lett bekapcsolva, élő fiókkal kipróbálva:
+működik. Vészfék: a `config.js`-ben `redirectSignIn: false` visszaadja a felugró ablakos
+belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-terv.md`,
 „ITT KEZDD" → „Hol tartunk".
 
 ## Mit tud
