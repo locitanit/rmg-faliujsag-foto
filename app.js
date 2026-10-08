@@ -274,7 +274,7 @@ document.addEventListener(
   }),
 );
 
-// The top bar: instructions (shown until switched off; this phone remembers), the
+// The top bar: instructions (closed until asked for; this phone remembers), the
 // home-screen tip, and the account menu with "Kijelentkezés".
 const HELP_KEY = "faliujsag-foto.help";
 
@@ -294,7 +294,7 @@ $("help-button").addEventListener("click", () => {
   try {
     localStorage.setItem(HELP_KEY, open ? "on" : "off");
   } catch {
-    // private mode: open again next time, nothing else is lost
+    // private mode: closed again next time, nothing else is lost
   }
   if (open) $("help").scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
@@ -346,9 +346,9 @@ if ("serviceWorker" in navigator) {
 
 $("hint").value = savedHint();
 try {
-  showHelp(localStorage.getItem(HELP_KEY) !== "off");
+  showHelp(localStorage.getItem(HELP_KEY) === "on");
 } catch {
-  showHelp(true);
+  showHelp(false);
 }
 
 guard(async () => {

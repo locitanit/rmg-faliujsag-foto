@@ -20,7 +20,7 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
 
 - **Képernyő:** sötét, az RMG Tools sötét módjának színeivel. Belépés előtt csak a belépő
   doboz látszik; belépés után a leírás, a Fotó gomb és a pipalista. Fent három ikon:
-  **?** (a leírás ki-be; a telefon megjegyzi), **telefon** (tipp a kezdőképernyőre tételhez),
+  **?** (a leírás ki-be, alapból csukva; a telefon megjegyzi), **telefon** (tipp a kezdőképernyőre tételhez),
   **fiók** (felugró menü, benne a Kijelentkezés).
 - Belépés iskolai Google-fiókkal (Google Identity Services; a token csak a memóriában él).
 - **Mindig a jó fiókkal:** a belépés előtt beírható az iskolai e-mail cím. Csak a telefon
