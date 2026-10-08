@@ -57,6 +57,11 @@ def write_dictionary(layout) -> None:
 def write_layout(layout) -> None:
     zones = {zone.id: zone for zone in layout.zones}
     groups = []
+
+    def top_down(zone, column):
+        # As the stickers really are on the wall (zones.json may record swapped ones).
+        return sorted(column, key=lambda marker: zone.markers[marker][1])
+
     for zone_id, name in GROUPS:
         zone = zones[zone_id]
         items = []
@@ -68,18 +73,20 @@ def write_layout(layout) -> None:
                     items.append({
                         "id": f"{door.id}-resz-{index + 1}",
                         "label": f"{index + 1}. rész",
-                        "columns": [list(columns[index]), list(columns[index + 1])],
+                        "columns": [top_down(zone, columns[index]),
+                                    top_down(zone, columns[index + 1])],
                     })
             else:
                 items.append({
                     "id": door.id,
                     "label": f"{door.number}. ajtó",
-                    "columns": [list(column) for column in columns],
+                    "columns": [top_down(zone, column) for column in columns],
                 })
         groups.append({"id": zone_id, "name": name, "items": items})
     body = (
         "// The check-list: every item is ticked by a photo that holds at least 2 stickers of\n"
-        "// both of its sticker columns (the processor's own rule).\n"
+        "// both of its sticker columns (the processor's own rule). The stickers of a column\n"
+        "// are listed top to bottom.\n"
         f"export const MARKER_MM = {layout.marker_mm:g};\n"
         f"export const GROUPS = {json.dumps(groups, ensure_ascii=False, indent=2)};\n"
     )

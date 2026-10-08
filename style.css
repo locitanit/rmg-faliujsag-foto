@@ -149,6 +149,25 @@ button:disabled {
   font-weight: 600;
 }
 
+.chip.top,
+.chip.bottom {
+  border-color: var(--ok);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.chip.top {
+  background: linear-gradient(to bottom, var(--ok) 50%, transparent 50%);
+}
+
+.chip.bottom {
+  background: linear-gradient(to top, var(--ok) 50%, transparent 50%);
+}
+
+#wall-legend {
+  margin-top: 8px;
+}
+
 button.ready {
   background: var(--ok);
   border-color: var(--ok);

@@ -30,14 +30,53 @@ export function coveredItems(ids, groups) {
 }
 
 /**
+ * Which half of each item the photo shows: [{id, top, bottom}].
+ *
+ * A door may be photographed in two closer photos. Its columns have three stickers (top,
+ * middle, bottom): a photo reaches the top half if it holds the top sticker and one below
+ * it in both columns, and the bottom half likewise. A board part has two stickers per
+ * column, so a photo that counts for it always shows all of it.
+ */
+export function coveredParts(ids, groups) {
+  const seen = new Set(ids);
+  const parts = [];
+  for (const item of allItems(groups)) {
+    const levels = item.columns.map((column) =>
+      column.map((id, level) => (seen.has(id) ? level : -1)).filter((level) => level >= 0),
+    );
+    if (levels.some((found) => found.length < MIN_MARKERS_PER_COLUMN)) continue;
+    const last = item.columns[0].length - 1;
+    const top = levels.every((found) => found[0] === 0);
+    const bottom = levels.every((found) => found[found.length - 1] === last);
+    // Top half on one side and bottom half on the other: a photo too skewed to count.
+    if (top || bottom) parts.push({ id: item.id, top, bottom });
+  }
+  return parts;
+}
+
+export const TOP = "top";
+export const BOTTOM = "bottom";
+export const markOf = (id, half) => `${id}:${half}`;
+
+/**
  * markers: from aruco.detectMarkers, `side` in pixels of the FULL-SIZE photo.
  * sharpness: aruco.sharpness of the sharpest sticker, or null when it could not be measured.
  */
 export function judge({ markers, sharpness, groups }) {
   const known = new Set(allItems(groups).flatMap((item) => item.columns.flat()));
   const ours = markers.filter((marker) => known.has(marker.id));
-  const items = coveredItems(ours.map((marker) => marker.id), groups);
+  const parts = coveredParts(ours.map((marker) => marker.id), groups);
+  const items = parts.map((part) => part.id);
   const names = new Map(allItems(groups).map((i) => [i.id, `${i.groupName} – ${i.label}`]));
+  // What the round remembers (rounds.js): one mark per half that was photographed.
+  const marks = parts.flatMap((part) => [
+    ...(part.top ? [markOf(part.id, TOP)] : []),
+    ...(part.bottom ? [markOf(part.id, BOTTOM)] : []),
+  ]);
+  const labels = parts.map((part) => {
+    const half = part.top && part.bottom ? "" : part.top ? " (a teteje)" : " (az alja)";
+    return names.get(part.id) + half;
+  });
   const warnings = [];
   let pxPerMm = null;
 
@@ -68,5 +107,5 @@ export function judge({ markers, sharpness, groups }) {
       });
     }
   }
-  return { items, labels: items.map((id) => names.get(id)), warnings, pxPerMm };
+  return { items, marks, labels, warnings, pxPerMm };
 }

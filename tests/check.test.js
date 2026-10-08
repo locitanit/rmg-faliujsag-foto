@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { MIN_PX_PER_MM, MIN_SHARPNESS, allItems, coveredItems, judge } from "../check.js";
+import * as checkModule from "../check.js";
 import { GROUPS } from "../layout.js";
 
 const marker = (id, side = 200) => ({ id, side, corners: [] });
@@ -73,4 +74,37 @@ test("a blurred photo is a warning; an unknown sharpness is not", () => {
   const soft = judged([0, 1, 2, 3, 4, 5], { sharpness: MIN_SHARPNESS - 0.02 });
   assert.deepEqual(soft.warnings.map((w) => w.code), ["blurred"]);
   assert.deepEqual(judged([0, 1, 2, 3, 4, 5], { sharpness: null }).warnings, []);
+});
+
+// Door 1 of the right row: left column 0 (top), 2 (middle), 1 (bottom) – two of them are
+// swapped on the wall –, right column 3, 4, 5.
+test("a door photographed in two halves: each photo says which half it shows", () => {
+  const { coveredParts } = checkModule;
+  assert.deepEqual(coveredParts([0, 2, 3, 4], GROUPS), [{ id: "sor-1-ajto-1", top: true, bottom: false }]);
+  assert.deepEqual(coveredParts([2, 1, 4, 5], GROUPS), [{ id: "sor-1-ajto-1", top: false, bottom: true }]);
+  assert.deepEqual(coveredParts([0, 1, 2, 3, 4, 5], GROUPS), [{ id: "sor-1-ajto-1", top: true, bottom: true }]);
+  // The four corners without the middle stickers: the whole door.
+  assert.deepEqual(coveredParts([0, 1, 3, 5], GROUPS), [{ id: "sor-1-ajto-1", top: true, bottom: true }]);
+  // Top on one side, bottom on the other: neither half.
+  assert.deepEqual(coveredParts([0, 2, 4, 5], GROUPS), []);
+});
+
+test("a part of a cork board is always whole", () => {
+  const { coveredParts } = checkModule;
+  assert.deepEqual(coveredParts([42, 43, 44, 45], GROUPS), [{ id: "parafa-1-resz-1", top: true, bottom: true }]);
+});
+
+test("the verdict carries a mark per half, and names the half in its label", () => {
+  const top = judged([0, 2, 3, 4]);
+  assert.deepEqual(top.marks, ["sor-1-ajto-1:top"]);
+  assert.deepEqual(top.labels, ["Jobb szekrénysor – 1. ajtó (a teteje)"]);
+  assert.deepEqual(top.warnings, []);
+
+  const bottom = judged([2, 1, 4, 5]);
+  assert.deepEqual(bottom.marks, ["sor-1-ajto-1:bottom"]);
+  assert.deepEqual(bottom.labels, ["Jobb szekrénysor – 1. ajtó (az alja)"]);
+
+  const whole = judged([0, 1, 2, 3, 4, 5]);
+  assert.deepEqual(whole.marks, ["sor-1-ajto-1:top", "sor-1-ajto-1:bottom"]);
+  assert.deepEqual(whole.labels, ["Jobb szekrénysor – 1. ajtó"]);
 });

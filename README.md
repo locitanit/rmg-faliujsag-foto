@@ -26,6 +26,9 @@ távolság, élesség) **valódi fotón még nincs kipróbálva**, csak generál
   Ez csak tanács: ha az ellenőrzés nem sikerül, a fotó akkor is megmarad.
 - **Pipalista:** a fal 17 része (12 ajtó + a két tábla 3 + 2 része); a Kész gomb zöld, ha
   mind megvan – de hiányosan is beküldhető.
+- **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó
+  **teteje** (▲, a csempe felül zöld); alsó + középső = az **alja** (▼). A kettő együtt (vagy
+  egy egész-ajtós fotó) adja a pipát. A parafatábla része mindig egészben számít.
 - **Kész** gomb → `done.json` a kör mappájába (csak darabszám és időpont). A feldolgozó
   csak a `done.json`-nal lezárt kört olvassa be.
 - Kezdőképernyőre tehető (PWA), a héja net nélkül is megnyílik.

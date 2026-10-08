@@ -1,7 +1,7 @@
 // The screen: sign in, take photos, "Kész". All the logic lives in rounds.js / drive.js.
 
 import { createAuth } from "./auth.js";
-import { allItems } from "./check.js";
+import { BOTTOM, TOP, allItems, markOf } from "./check.js";
 import { CONFIG } from "./config.js";
 import { createDrive } from "./drive.js";
 import { GROUPS } from "./layout.js";
@@ -28,6 +28,8 @@ function renderWall(marks) {
   const have = new Set(marks);
   const wall = $("wall");
   wall.replaceChildren();
+  let whole = 0;
+  let half = 0;
   for (const group of GROUPS) {
     const box = document.createElement("div");
     const name = document.createElement("div");
@@ -36,17 +38,27 @@ function renderWall(marks) {
     const chips = document.createElement("div");
     chips.className = "chips";
     group.items.forEach((item, index) => {
+      const top = have.has(markOf(item.id, TOP));
+      const bottom = have.has(markOf(item.id, BOTTOM));
       const chip = document.createElement("span");
-      chip.className = have.has(item.id) ? "chip have" : "chip";
-      chip.textContent = have.has(item.id) ? `✓ ${index + 1}` : String(index + 1);
-      chip.title = `${group.name} – ${item.label}`;
+      // A door photographed in two halves: the chip is green where the door is done.
+      chip.className = `chip${top && bottom ? " have" : top ? " top" : bottom ? " bottom" : ""}`;
+      const number = String(index + 1);
+      chip.textContent = top && bottom ? `✓ ${number}` : top ? `${number} ▲` : bottom ? `${number} ▼` : number;
+      const state = top && bottom ? "megvan" : top ? "csak a teteje van meg" : bottom ? "csak az alja van meg" : "nincs meg";
+      chip.title = `${group.name} – ${item.label}: ${state}`;
+      chip.setAttribute("aria-label", chip.title);
+      if (top && bottom) whole += 1;
+      else if (top || bottom) half += 1;
       chips.append(chip);
     });
     box.append(name, chips);
     wall.append(box);
   }
-  $("wall-title").textContent = `Megvan ebben a körben: ${have.size} / ${ITEM_COUNT}`;
-  $("done").classList.toggle("ready", have.size === ITEM_COUNT);
+  const halves = half ? ` (+ ${half} félig)` : "";
+  $("wall-title").textContent = `Megvan ebben a körben: ${whole} / ${ITEM_COUNT}${halves}`;
+  $("wall-legend").hidden = half === 0;
+  $("done").classList.toggle("ready", whole === ITEM_COUNT);
 }
 
 function showReview(warnings) {
@@ -66,7 +78,7 @@ function closeReview() {
 }
 
 async function keep(file, verdict) {
-  await rounds.addPhoto(file, verdict?.items ?? []);
+  await rounds.addPhoto(file, verdict?.marks ?? []);
   if (!verdict) {
     $("last").textContent = "Ezt a fotót nem tudtam ellenőrizni, de elmentettem.";
   } else if (verdict.labels.length) {
