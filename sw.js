@@ -2,7 +2,7 @@
 // then wait in the local queue). Network first – a new version shows up at once; the
 // cached copy is only the fallback. Nothing from Google is ever cached.
 
-const CACHE = "faliujsag-foto-v6";
+const CACHE = "faliujsag-foto-v7";
 const SHELL = [
   "./",
   "index.html",
@@ -16,6 +16,7 @@ const SHELL = [
   "drive.js",
   "layout.js",
   "photo.js",
+  "redirect-auth.js",
   "rounds.js",
   "store.js",
   "manifest.webmanifest",

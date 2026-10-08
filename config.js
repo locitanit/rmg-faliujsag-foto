@@ -20,4 +20,11 @@ export const CONFIG = {
   // chooser only offers accounts of the school. Empty = no restriction here (the Internal
   // OAuth project refuses other accounts anyway).
   hostedDomain: "",
+
+  // true: sign-in by redirect instead of a pop-up – the app then signs in BY ITSELF every
+  // time it is opened (after the first sign-in on that phone). Before switching it on, the
+  // app's address must be added to the OAuth client as an "Authorized redirect URI"
+  // (exactly, with the trailing slash) – otherwise Google shows an error page instead of
+  // the app. false: the pop-up sign-in, one tap on "Belépés" per hour.
+  redirectSignIn: false,
 };

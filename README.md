@@ -113,3 +113,22 @@ python -m http.server 8765
 - A faliújságon diáknevek is lehetnek: a fotó csak a telefon → iskolai Drive úton megy.
 - A GitHubon nincs adat. A `done.json`-ban nincs név vagy e-mail.
 - Hibaüzenetbe, naplóba nem kerül token, fájlnév, szöveg.
+
+## Belépés gomb nélkül (átirányításos belépés)
+
+Alapból a belépés felugró ablakkal megy: óránként egy koppintás a „Belépés" gombra (a
+böngésző csak koppintásra enged felugró ablakot nyitni). A `config.js` `redirectSignIn: true`
+értékével a belépés **átirányítással** megy: az oldal maga megy át a Google-höz és jön vissza
+– ehhez nem kell koppintás, ezért az app megnyitáskor (és ha menet közben lejár a belépés)
+**magától belép**. Belépni így telefononként egyszer kell; utána csak akkor, ha valaki a
+„Kijelentkezés"-re nyom, vagy a Google-fiókból kilép a böngészőben.
+
+**Bekapcsolás előtt** az OAuth-kliensnél (Google Cloud → Credentials → a webes kliens) az
+**Authorized redirect URIs** közé fel kell venni az app címét, pontosan, a végén perjellel:
+
+- `https://locitanit.github.io/rmg-faliujsag-foto/`
+- helyi próbához: `http://localhost:8765/`
+
+Enélkül a Google hibaoldalt mutat az app helyett. Részletek és a tárolt adatok: a
+`redirect-auth.js` eleje. iPhone kezdőképernyős appban (ahol az átirányítás külön
+böngészőlapon nyílna) automatikusan a felugró ablakos belépés marad.

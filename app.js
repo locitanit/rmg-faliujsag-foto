@@ -6,6 +6,7 @@ import { CONFIG } from "./config.js";
 import { createDrive } from "./drive.js";
 import { GROUPS } from "./layout.js";
 import { inspect } from "./photo.js";
+import { createRedirectAuth } from "./redirect-auth.js";
 import { Rounds } from "./rounds.js";
 import { BrowserStore } from "./store.js";
 
@@ -39,7 +40,21 @@ function rememberHint() {
   }
 }
 
-const auth = createAuth({ ...CONFIG, getHint: () => $("hint").value.trim() || savedHint() });
+// Sign-in by redirect (config.js) signs in by itself when the app is opened. Not in an
+// iPhone home-screen app: there a redirect opens in a separate browser sheet and never
+// comes back into the app, so the pop-up stays.
+const redirectMode = Boolean(CONFIG.redirectSignIn) && !navigator.standalone;
+const authOptions = { ...CONFIG, getHint: () => $("hint").value.trim() || savedHint() };
+const auth = redirectMode ? createRedirectAuth(authOptions) : createAuth(authOptions);
+let busy = false; // a photo is being looked at: not the moment to leave the page
+
+/** Sign in again without a tap, if that is possible right now. True = the page is leaving. */
+function renewSilently() {
+  if (!redirectMode || !configured || busy || pending || !navigator.onLine) return false;
+  if (!auth.silent()) return false;
+  say("Belépés…");
+  return true;
+}
 const rounds = new Rounds({
   store: new BrowserStore(),
   drive: createDrive({ getToken: auth.getToken }),
@@ -143,10 +158,13 @@ async function take(file) {
   $("last").textContent = "";
   say("Megnézem a fotót…");
   let verdict = null;
+  busy = true;
   try {
     verdict = await inspect(file);
   } catch {
     verdict = null; // the check is only advice: a photo is never lost because of it
+  } finally {
+    busy = false;
   }
   say("");
   if (verdict?.warnings.length) {
@@ -166,6 +184,7 @@ async function render() {
   const status = await rounds.status();
   $("setup").hidden = configured;
   $("signin-box").hidden = !configured || auth.signedIn();
+  $("signout").hidden = !redirectMode || !auth.signedIn();
   renderWall(status.marks, status.empty);
   $("counts").textContent = status.waiting
     ? `${status.waiting} fotó vár feltöltésre a telefonon`
@@ -181,6 +200,7 @@ async function sync() {
   const after = await render();
   if (result.state === "signin") {
     auth.forget();
+    if (renewSilently()) return; // back in a moment, signed in; nothing is lost meanwhile
     await render();
     say(result.message, "bad");
   } else if (result.state !== "idle") {
@@ -243,7 +263,18 @@ window.addEventListener("online", guard(sync));
 document.addEventListener(
   "visibilitychange",
   guard(async () => {
-    if (!document.hidden) await sync();
+    if (document.hidden) return;
+    if (!auth.signedIn() && renewSilently()) return;
+    await sync();
+  }),
+);
+
+$("signout").addEventListener(
+  "click",
+  guard(async () => {
+    auth.signOut();
+    say("Kijelentkeztél. A fotók addig a telefonon várnak, amíg újra be nem lépsz.");
+    await render();
   }),
 );
 setInterval(guard(sync), RETRY_EVERY_MS);
@@ -261,9 +292,15 @@ if ("serviceWorker" in navigator) {
 $("hint").value = savedHint();
 
 guard(async () => {
+  // Back from Google? Or opened after days? Either way: signed in before anything else.
+  const back = redirectMode ? auth.restore() : "none";
+  if (!auth.signedIn() && back !== "refused" && renewSilently()) return;
   await rounds.finishIdle(IDLE_CLOSE_MS); // a round left open last time
   const status = await render();
-  if ((status.waiting || status.closing) && !auth.signedIn()) {
+  if (back === "refused") {
+    say("A Google most nem enged be magától. Nyomd meg a Belépés gombot.", "bad");
+  } else if ((status.waiting || status.closing) && !auth.signedIn()) {
     say("Van, ami még a telefonon vár. Lépj be, és felmegy.");
   }
+  if (auth.signedIn()) await sync();
 })();

@@ -98,6 +98,14 @@ button,
   color: var(--text);
 }
 
+.small-button {
+  align-self: center;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 8px 16px;
+  color: var(--muted);
+}
+
 button:disabled {
   opacity: 0.45;
   cursor: default;
