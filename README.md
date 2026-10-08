@@ -8,8 +8,9 @@ veszi fel őket. Terv: `rmg_tools/docs/faliujsag-fotozo-webapp-terv.md`.
 Nincs szerver, nincs build: sima statikus fájlok (GitHub Pages-re való).
 
 **Állapot:** él a GitHub Pages-en (`https://locitanit.github.io/rmg-faliujsag-foto/`), a
-feltöltés élő fiókkal kipróbálva (gépről és telefonról). A fotó-ellenőrzés (matricák,
-távolság, élesség) **valódi fotón még nincs kipróbálva**, csak generált képeken.
+feltöltés élő fiókkal kipróbálva (gépről és telefonról). A fotó-ellenőrzés telefonon, valódi ajtón
+kipróbálva (2026-10-08: egész ajtó és két fél fotó – az 1. ajtón, mert csak azon van
+matrica). A „túl messze" és az „életlen" küszöb még becslés; parafatáblán nem volt próba.
 
 ## Mit tud
 
