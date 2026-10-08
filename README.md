@@ -30,8 +30,13 @@ matrica). A „túl messze" és az „életlen" küszöb még becslés; parafat�
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó
   **teteje** (▲, a csempe felül zöld); alsó + középső = az **alja** (▼). A kettő együtt (vagy
   egy egész-ajtós fotó) adja a pipát. A parafatábla része mindig egészben számít.
-- **Kész** gomb → `done.json` a kör mappájába (csak darabszám és időpont). A feldolgozó
-  csak a `done.json`-nal lezárt kört olvassa be.
+- **Üres ajtó fotó nélkül:** ha egy szekrényajtóról minden lekerült, a listán a számára
+  koppintva „üres"-nek jelölhető (még egy koppintás visszavonja). A feldolgozó ilyenkor az
+  ajtó papírjait fotó nélkül „lekerült"-re állítja. Ha ugyanarról az ajtóról fotó is készül
+  a körben, a fotó számít. Parafatáblán nincs ilyen.
+- **Kész** gomb → `done.json` a kör mappájába: darabszám, időpont, és az üresnek jelölt
+  ajtók (`"empty": ["sor-1-ajto-3"]`). A feldolgozó csak a `done.json`-nal lezárt kört
+  olvassa be. Fotó nélküli kör is beküldhető, ha van benne üresnek jelölt ajtó.
 - Kezdőképernyőre tehető (PWA), a héja net nélkül is megnyílik.
 
 Mappa a meghajtón: `faliujsag/bejovo/<ÉÉÉÉHHNN-ÓÓPPMM-xxxx>/foto-01.jpg … done.json`.

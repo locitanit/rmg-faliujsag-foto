@@ -12,6 +12,7 @@ export const GROUPS = [
       {
         "id": "sor-2-ajto-1",
         "label": "1. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             21,
@@ -28,6 +29,7 @@ export const GROUPS = [
       {
         "id": "sor-2-ajto-2",
         "label": "2. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             24,
@@ -44,6 +46,7 @@ export const GROUPS = [
       {
         "id": "sor-2-ajto-3",
         "label": "3. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             27,
@@ -60,6 +63,7 @@ export const GROUPS = [
       {
         "id": "sor-2-ajto-4",
         "label": "4. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             30,
@@ -76,6 +80,7 @@ export const GROUPS = [
       {
         "id": "sor-2-ajto-5",
         "label": "5. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             33,
@@ -92,6 +97,7 @@ export const GROUPS = [
       {
         "id": "sor-2-ajto-6",
         "label": "6. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             36,
@@ -114,6 +120,7 @@ export const GROUPS = [
       {
         "id": "sor-1-ajto-1",
         "label": "1. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             0,
@@ -130,6 +137,7 @@ export const GROUPS = [
       {
         "id": "sor-1-ajto-2",
         "label": "2. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             3,
@@ -146,6 +154,7 @@ export const GROUPS = [
       {
         "id": "sor-1-ajto-3",
         "label": "3. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             6,
@@ -162,6 +171,7 @@ export const GROUPS = [
       {
         "id": "sor-1-ajto-4",
         "label": "4. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             9,
@@ -178,6 +188,7 @@ export const GROUPS = [
       {
         "id": "sor-1-ajto-5",
         "label": "5. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             12,
@@ -194,6 +205,7 @@ export const GROUPS = [
       {
         "id": "sor-1-ajto-6",
         "label": "6. ajtó",
+        "canBeEmpty": true,
         "columns": [
           [
             15,

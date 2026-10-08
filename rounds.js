@@ -65,6 +65,9 @@ export class Rounds {
     round.taken += 1;
     // The pieces of the wall this photo shows (check.js) – for the check-list only.
     round.marks = [...new Set([...(round.marks ?? []), ...marks])].sort();
+    // A photo of a door is stronger than an earlier "empty" click on it.
+    const shown = new Set(marks.map((mark) => mark.split(":")[0]));
+    round.empty = (round.empty ?? []).filter((id) => !shown.has(id));
     // The photo first: a round that counts a photo it does not have could never close.
     await this.store.putPhoto({
       id: `${round.id}/${two(round.taken)}`,
@@ -75,11 +78,37 @@ export class Rounds {
     await this.store.putRound(round);
   }
 
+  /**
+   * A cabinet door reported empty (nothing hangs on it): no photo needed, the processor
+   * takes its papers down. Travels in done.json. `on = false` takes the mark back.
+   */
+  async setEmpty(itemId, on) {
+    const started = this.now();
+    const round = (await this._open()) ?? {
+      id: newRoundId(started, this.random),
+      startedAt: started.toISOString(),
+      folderId: null,
+      taken: 0,
+      uploaded: 0,
+      closing: false,
+      marks: [],
+    };
+    const empty = new Set(round.empty ?? []);
+    if (on) empty.add(itemId);
+    else empty.delete(itemId);
+    round.empty = [...empty].sort();
+    if (round.taken === 0 && round.empty.length === 0) {
+      await this.store.deleteRound(round.id); // nothing in it: as if it never started
+      return;
+    }
+    await this.store.putRound(round);
+  }
+
   /** "Kész": no more photos in this round; done.json follows the last upload. */
   async finish() {
     const round = await this._open();
     if (!round) return;
-    if (round.taken === 0) {
+    if (round.taken === 0 && !round.empty?.length) {
       await this.store.deleteRound(round.id);
       return;
     }
@@ -99,6 +128,7 @@ export class Rounds {
       taken: shown?.taken ?? 0,
       uploaded: shown?.uploaded ?? 0,
       marks: open?.marks ?? [],
+      empty: open?.empty ?? [],
       waiting,
     };
   }
@@ -133,7 +163,8 @@ export class Rounds {
     const photos = (await this.store.getPhotos())
       .filter((photo) => photo.roundId === round.id)
       .sort((a, b) => a.id.localeCompare(b.id));
-    if (photos.length && !round.folderId) {
+    const emptyOnly = round.closing && Boolean(round.empty?.length);
+    if ((photos.length || emptyOnly) && !round.folderId) {
       round.folderId = await this.drive.createFolder(round.id, this.inboxFolderId);
       await this.store.putRound(round);
     }
@@ -146,7 +177,12 @@ export class Rounds {
     if (!round.closing) return;
     if (round.folderId) {
       // Counts only: who took the photos is nobody's business in a file (Drive knows anyway).
-      const done = { schema: 1, photos: round.uploaded, finished_at: this.now().toISOString() };
+      const done = {
+        schema: 1,
+        photos: round.uploaded,
+        finished_at: this.now().toISOString(),
+        empty: round.empty ?? [], // doors reported empty, without a photo
+      };
       const blob = new Blob([JSON.stringify(done)], { type: "application/json" });
       await this.drive.uploadFile(DONE_FILE, blob, round.folderId);
     }

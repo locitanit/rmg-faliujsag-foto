@@ -24,8 +24,9 @@ let pending = null; // a photo with warnings, waiting for "Újra fotózom" / "Í
 const ITEM_COUNT = allItems(GROUPS).length;
 
 /** The check-list: every door and board part, ticked when a photo of this round shows it. */
-function renderWall(marks) {
+function renderWall(marks, emptyDoors) {
   const have = new Set(marks);
+  const empty = new Set(emptyDoors);
   const wall = $("wall");
   wall.replaceChildren();
   let whole = 0;
@@ -40,15 +41,27 @@ function renderWall(marks) {
     group.items.forEach((item, index) => {
       const top = have.has(markOf(item.id, TOP));
       const bottom = have.has(markOf(item.id, BOTTOM));
-      const chip = document.createElement("span");
+      const isEmpty = empty.has(item.id);
+      // A cabinet door is a button: a tap says "nothing hangs on it" (and a tap takes it back).
+      const chip = document.createElement(item.canBeEmpty ? "button" : "span");
       // A door photographed in two halves: the chip is green where the door is done.
-      chip.className = `chip${top && bottom ? " have" : top ? " top" : bottom ? " bottom" : ""}`;
+      const look = isEmpty ? " empty" : top && bottom ? " have" : top ? " top" : bottom ? " bottom" : "";
+      chip.className = `chip${look}`;
       const number = String(index + 1);
-      chip.textContent = top && bottom ? `✓ ${number}` : top ? `${number} ▲` : bottom ? `${number} ▼` : number;
-      const state = top && bottom ? "megvan" : top ? "csak a teteje van meg" : bottom ? "csak az alja van meg" : "nincs meg";
+      chip.textContent = isEmpty
+        ? `${number} üres`
+        : top && bottom ? `✓ ${number}` : top ? `${number} ▲` : bottom ? `${number} ▼` : number;
+      const state = isEmpty
+        ? "üresnek jelölve"
+        : top && bottom ? "megvan" : top ? "csak a teteje van meg" : bottom ? "csak az alja van meg" : "nincs meg";
       chip.title = `${group.name} – ${item.label}: ${state}`;
       chip.setAttribute("aria-label", chip.title);
-      if (top && bottom) whole += 1;
+      if (item.canBeEmpty) {
+        chip.type = "button";
+        chip.setAttribute("aria-pressed", String(isEmpty));
+        chip.addEventListener("click", guard(() => toggleEmpty(item, top || bottom, isEmpty)));
+      }
+      if (isEmpty || (top && bottom)) whole += 1;
       else if (top || bottom) half += 1;
       chips.append(chip);
     });
@@ -59,6 +72,17 @@ function renderWall(marks) {
   $("wall-title").textContent = `Megvan ebben a körben: ${whole} / ${ITEM_COUNT}${halves}`;
   $("wall-legend").hidden = half === 0;
   $("done").classList.toggle("ready", whole === ITEM_COUNT);
+}
+
+async function toggleEmpty(item, photographed, isEmpty) {
+  if (photographed && !isEmpty) {
+    say("Erről az ajtóról ebben a körben már van fotó, ezért nem jelölhető üresnek.");
+    return;
+  }
+  await rounds.setEmpty(item.id, !isEmpty);
+  finishing = false;
+  say("");
+  await render();
 }
 
 function showReview(warnings) {
@@ -119,8 +143,8 @@ async function render() {
   const status = await rounds.status();
   $("setup").hidden = configured;
   $("signin").hidden = !configured || auth.signedIn();
-  $("done").disabled = !status.open || status.taken === 0;
-  renderWall(status.marks);
+  $("done").disabled = !status.open || (status.taken === 0 && status.empty.length === 0);
+  renderWall(status.marks, status.empty);
   if (status.taken === 0 && status.waiting === 0) {
     $("counts").textContent = "";
   } else {

@@ -80,6 +80,8 @@ def write_layout(layout) -> None:
                 items.append({
                     "id": door.id,
                     "label": f"{door.number}. ajtó",
+                    # A cabinet door can be reported empty with a tap, without a photo.
+                    "canBeEmpty": True,
                     "columns": [top_down(zone, column) for column in columns],
                 })
         groups.append({"id": zone_id, "name": name, "items": items})

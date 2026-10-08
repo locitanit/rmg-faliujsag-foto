@@ -66,7 +66,7 @@ test("finishing writes done.json last, with counts only", async () => {
   assert.equal(result.state, "idle");
   assert.deepEqual(drive.files.map((f) => f.name), ["foto-01.jpg", "foto-02.jpg", "done.json"]);
   const done = JSON.parse(await drive.files[2].blob.text());
-  assert.deepEqual(done, { schema: 1, photos: 2, finished_at: NOW.toISOString() });
+  assert.deepEqual(done, { schema: 1, photos: 2, finished_at: NOW.toISOString(), empty: [] });
   assert.equal((await rounds.status()).open, false);
 
   // The next photo starts a new round.
@@ -165,4 +165,39 @@ test("a round remembers which pieces of the wall its photos ticked", async () =>
   await rounds.finish();
   await rounds.pump();
   assert.deepEqual((await rounds.status()).marks, []); // a new round starts clean
+});
+
+test("doors clicked empty travel in done.json – even in a round without a photo", async () => {
+  const { drive, rounds } = setup();
+  await rounds.setEmpty("sor-1-ajto-3", true);
+  await rounds.setEmpty("sor-1-ajto-4", true);
+  await rounds.setEmpty("sor-1-ajto-4", false); // clicked back
+  let status = await rounds.status();
+  assert.deepEqual([status.open, status.taken, status.empty], [true, 0, ["sor-1-ajto-3"]]);
+
+  await rounds.pump();
+  assert.equal(drive.folders.length + drive.files.length, 0); // nothing goes up before "Kész"
+
+  await rounds.finish();
+  assert.equal((await rounds.pump()).state, "idle");
+  assert.equal(drive.folders.length, 1);
+  assert.deepEqual(drive.files.map((f) => f.name), ["done.json"]);
+  const done = JSON.parse(await drive.files[0].blob.text());
+  assert.deepEqual([done.photos, done.empty], [0, ["sor-1-ajto-3"]]);
+  status = await rounds.status();
+  assert.deepEqual([status.open, status.empty], [false, []]);
+});
+
+test("a photo of a door takes back its empty mark; unclicking everything leaves no round", async () => {
+  const { store, rounds } = setup();
+  await rounds.setEmpty("sor-1-ajto-1", true);
+  await rounds.setEmpty("sor-1-ajto-2", true);
+  await rounds.addPhoto(fakeBlob(), ["sor-1-ajto-1:top"]);
+  assert.deepEqual((await rounds.status()).empty, ["sor-1-ajto-2"]);
+
+  const other = setup();
+  await other.rounds.setEmpty("sor-1-ajto-1", true);
+  await other.rounds.setEmpty("sor-1-ajto-1", false);
+  assert.equal((await other.store.getRounds()).length, 0);
+  assert.equal((await store.getRounds()).length, 1);
 });

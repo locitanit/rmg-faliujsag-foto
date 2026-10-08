@@ -149,6 +149,25 @@ button:disabled {
   font-weight: 600;
 }
 
+button.chip {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  background: transparent;
+  cursor: pointer;
+}
+
+.chip.empty {
+  background: var(--muted);
+  border-color: var(--muted);
+  color: var(--card);
+  font-weight: 600;
+}
+
+.tip {
+  margin-top: 8px;
+}
+
 .chip.top,
 .chip.bottom {
   border-color: var(--ok);
