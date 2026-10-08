@@ -1,8 +1,11 @@
 // The screen: sign in, take photos, "Kész". All the logic lives in rounds.js / drive.js.
 
 import { createAuth } from "./auth.js";
+import { allItems } from "./check.js";
 import { CONFIG } from "./config.js";
 import { createDrive } from "./drive.js";
+import { GROUPS } from "./layout.js";
+import { inspect } from "./photo.js";
 import { Rounds } from "./rounds.js";
 import { BrowserStore } from "./store.js";
 
@@ -17,6 +20,83 @@ const rounds = new Rounds({
   inboxFolderId: CONFIG.inboxFolderId,
 });
 let finishing = false; // "Kész" was tapped: say so once the round is really up
+let pending = null; // a photo with warnings, waiting for "Újra fotózom" / "Így is jó"
+const ITEM_COUNT = allItems(GROUPS).length;
+
+/** The check-list: every door and board part, ticked when a photo of this round shows it. */
+function renderWall(marks) {
+  const have = new Set(marks);
+  const wall = $("wall");
+  wall.replaceChildren();
+  for (const group of GROUPS) {
+    const box = document.createElement("div");
+    const name = document.createElement("div");
+    name.className = "group-name";
+    name.textContent = group.name;
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    group.items.forEach((item, index) => {
+      const chip = document.createElement("span");
+      chip.className = have.has(item.id) ? "chip have" : "chip";
+      chip.textContent = have.has(item.id) ? `✓ ${index + 1}` : String(index + 1);
+      chip.title = `${group.name} – ${item.label}`;
+      chips.append(chip);
+    });
+    box.append(name, chips);
+    wall.append(box);
+  }
+  $("wall-title").textContent = `Megvan ebben a körben: ${have.size} / ${ITEM_COUNT}`;
+  $("done").classList.toggle("ready", have.size === ITEM_COUNT);
+}
+
+function showReview(warnings) {
+  $("review-text").replaceChildren(
+    ...warnings.map((warning) => {
+      const line = document.createElement("li");
+      line.textContent = warning.text;
+      return line;
+    }),
+  );
+  $("review").hidden = false;
+}
+
+function closeReview() {
+  pending = null;
+  $("review").hidden = true;
+}
+
+async function keep(file, verdict) {
+  await rounds.addPhoto(file, verdict?.items ?? []);
+  if (!verdict) {
+    $("last").textContent = "Ezt a fotót nem tudtam ellenőrizni, de elmentettem.";
+  } else if (verdict.labels.length) {
+    $("last").textContent = `✓ ${verdict.labels.join(", ")}`;
+  } else {
+    $("last").textContent = "";
+  }
+  finishing = false;
+  await sync();
+}
+
+/** A fresh photo: look at it first; with a warning the photographer decides. */
+async function take(file) {
+  closeReview();
+  $("last").textContent = "";
+  say("Megnézem a fotót…");
+  let verdict = null;
+  try {
+    verdict = await inspect(file);
+  } catch {
+    verdict = null; // the check is only advice: a photo is never lost because of it
+  }
+  say("");
+  if (verdict?.warnings.length) {
+    pending = { file, verdict };
+    showReview(verdict.warnings);
+    return;
+  }
+  await keep(file, verdict);
+}
 
 function say(text, kind = "") {
   $("status").textContent = text;
@@ -28,6 +108,7 @@ async function render() {
   $("setup").hidden = configured;
   $("signin").hidden = !configured || auth.signedIn();
   $("done").disabled = !status.open || status.taken === 0;
+  renderWall(status.marks);
   if (status.taken === 0 && status.waiting === 0) {
     $("counts").textContent = "";
   } else {
@@ -74,9 +155,24 @@ $("camera").addEventListener(
   guard(async (event) => {
     const files = [...event.target.files];
     event.target.value = ""; // the same photo slot can be used again
-    for (const file of files) await rounds.addPhoto(file);
-    finishing = false;
-    await sync();
+    for (const file of files) await take(file);
+  }),
+);
+
+$("retake").addEventListener(
+  "click",
+  guard(async () => {
+    closeReview(); // the photo is dropped: it was never saved or uploaded
+    $("camera").click();
+  }),
+);
+
+$("keep").addEventListener(
+  "click",
+  guard(async () => {
+    const { file, verdict } = pending;
+    closeReview();
+    await keep(file, verdict);
   }),
 );
 

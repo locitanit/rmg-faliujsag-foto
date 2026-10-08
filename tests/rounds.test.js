@@ -154,3 +154,15 @@ test("a file that is not a picture, or is too big for the processor, is refused"
   await assert.rejects(rounds.addPhoto(fakeBlob("image/jpeg", MAX_PHOTO_BYTES + 1)), /nagy/);
   assert.equal((await rounds.status()).taken, 0);
 });
+
+test("a round remembers which pieces of the wall its photos ticked", async () => {
+  const { rounds } = setup();
+  await rounds.addPhoto(fakeBlob(), ["sor-1-ajto-1"]);
+  await rounds.addPhoto(fakeBlob(), ["sor-1-ajto-2", "sor-1-ajto-1"]);
+  await rounds.addPhoto(fakeBlob());
+  assert.deepEqual((await rounds.status()).marks, ["sor-1-ajto-1", "sor-1-ajto-2"]);
+
+  await rounds.finish();
+  await rounds.pump();
+  assert.deepEqual((await rounds.status()).marks, []); // a new round starts clean
+});

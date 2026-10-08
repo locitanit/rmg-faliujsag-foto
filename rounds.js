@@ -45,7 +45,7 @@ export class Rounds {
   }
 
   /** Save a freshly taken photo into the open round (starting one if there is none). */
-  async addPhoto(blob) {
+  async addPhoto(blob, marks = []) {
     if (blob.type && !blob.type.startsWith("image/")) {
       throw new Error("Ez nem kép. Fotót készíts a kamerával.");
     }
@@ -60,8 +60,11 @@ export class Rounds {
       taken: 0,
       uploaded: 0,
       closing: false,
+      marks: [],
     };
     round.taken += 1;
+    // The pieces of the wall this photo shows (check.js) – for the check-list only.
+    round.marks = [...new Set([...(round.marks ?? []), ...marks])].sort();
     // The photo first: a round that counts a photo it does not have could never close.
     await this.store.putPhoto({
       id: `${round.id}/${two(round.taken)}`,
@@ -95,6 +98,7 @@ export class Rounds {
       closing: rounds.some((round) => round.closing),
       taken: shown?.taken ?? 0,
       uploaded: shown?.uploaded ?? 0,
+      marks: open?.marks ?? [],
       waiting,
     };
   }

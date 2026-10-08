@@ -7,7 +7,9 @@ veszi fel őket. Terv: `rmg_tools/docs/faliujsag-fotozo-webapp-terv.md`.
 
 Nincs szerver, nincs build: sima statikus fájlok (GitHub Pages-re való).
 
-**Állapot: megírva, élő Google-fiókkal még NEM próbálva.** Előbb a lenti beállítás kell.
+**Állapot:** él a GitHub Pages-en (`https://locitanit.github.io/rmg-faliujsag-foto/`), a
+feltöltés élő fiókkal kipróbálva (gépről és telefonról). A fotó-ellenőrzés (matricák,
+távolság, élesség) **valódi fotón még nincs kipróbálva**, csak generált képeken.
 
 ## Mit tud
 
@@ -15,6 +17,15 @@ Nincs szerver, nincs build: sima statikus fájlok (GitHub Pages-re való).
 - **Fotó** gomb → a telefon kamerája, teljes felbontás. A kép nem kerül a galériába.
 - A fotó előbb a telefonon vár (IndexedDB), aztán felmegy, és a telefonról törlődik.
   Net nélkül sem vész el: magától újrapróbálja (30 mp-enként, és amikor visszajön a net).
+- **Minden fotót megnéz a telefonon** (semmi nem megy ki hozzá): megkeresi rajta az
+  ArUco-matricákat, és
+  - kipipálja a listán, mit mutat (ajtó, vagy a parafatábla egy része) – ugyanazzal a
+    szabállyal, mint a feldolgozó: a rész mindkét matrica-oszlopából legalább 2–2 matrica;
+  - szól, ha **nincs elég matrica**, ha **túl messziről** készült (3,5 px/mm alatt), vagy ha
+    **életlen**. Ilyenkor választani lehet: „Újra fotózom" (a kép eldobva) vagy „Így is jó".
+  Ez csak tanács: ha az ellenőrzés nem sikerül, a fotó akkor is megmarad.
+- **Pipalista:** a fal 17 része (12 ajtó + a két tábla 3 + 2 része); a Kész gomb zöld, ha
+  mind megvan – de hiányosan is beküldhető.
 - **Kész** gomb → `done.json` a kör mappájába (csak darabszám és időpont). A feldolgozó
   csak a `done.json`-nal lezárt kört olvassa be.
 - Kezdőképernyőre tehető (PWA), a héja net nélkül is megnyílik.
@@ -31,13 +42,21 @@ Mappa a meghajtón: `faliujsag/bejovo/<ÉÉÉÉHHNN-ÓÓPPMM-xxxx>/foto-01.jpg �
    azonosítója: a mappa Drive-címének utolsó része). **Client secret nincs és nem is kell.**
 3. A fotózó kolléga legyen tagja a „beküldés” meghajtónak (közreműködő).
 
-### Az első élő próba (W1) – ezt még senki nem próbálta ki
+A `drive.file` engedély (az app csak a saját feltöltéseihez fér hozzá) elég: az élő próbán
+létre tudott hozni mappát a közös meghajtó `bejovo` mappájában (2026-10-08).
 
-A `drive.file` engedéllyel az app csak a saját feltöltéseihez fér hozzá. **Nem biztos**, hogy
-így létre tud hozni mappát a `bejovo` mappában. Ha az első fotónál azt írja ki, hogy
-„a beküldő mappa nem érhető el”, akkor nem megy – ilyenkor a `config.js`-ben a `scope`
-átírható `https://www.googleapis.com/auth/drive`-ra. Ez sokkal szélesebb engedély (a
-belépett felhasználó minden Drive-fájlja), ezért tudatos döntés legyen.
+### Ha változik a fal leírása
+
+A matricák kódjai (`dictionary.js`), a pipalista (`layout.js`) és a tesztképek az RMG Tools
+`zones.json`-jából készülnek. Ha ott új zóna vagy más szótár lesz, futtasd újra:
+
+```bash
+C:/Loci/prog/rmg_tools/core/.venv/Scripts/python tools/make_data.py C:/Loci/prog/rmg_tools/core
+```
+
+(Az oszloptávolságok átírása miatt nem kell: a webapp csak azt nézi, melyik matrica látszik.)
+A két küszöb (`MIN_PX_PER_MM`, `MIN_SHARPNESS`) a `check.js` elején van – valódi fotók
+alapján érdemes lehet hangolni.
 
 ## Fejlesztés
 
@@ -61,7 +80,11 @@ python -m http.server 8765
 | `config.js` | a két beállítandó érték + a kért engedély |
 | `auth.js` | Google-belépés |
 | `drive.js` | mappa létrehozása, feltöltés; időkorlát, újrapróbálás, magyar hibaüzenetek |
-| `rounds.js` | kör, várakozó sor, `done.json` |
+| `rounds.js` | kör, várakozó sor, `done.json`, a kör pipái |
+| `aruco.js` | saját, függőség nélküli ArUco-kereső + élességmérés |
+| `check.js` | mit mutat a fotó, elég közeli-e, éles-e (a figyelmeztetések szövege) |
+| `photo.js` | a fotó megnyitása a böngészőben az ellenőrzéshez |
+| `dictionary.js`, `layout.js` | **generált** (`tools/make_data.py`): matricakódok, pipalista |
 | `store.js` | a várakozó sor a telefonon (IndexedDB) |
 | `app.js`, `index.html`, `style.css` | a képernyő |
 | `sw.js`, `manifest.webmanifest`, `icons/` | PWA |

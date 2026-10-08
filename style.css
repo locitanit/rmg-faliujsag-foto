@@ -103,15 +103,70 @@ button:disabled {
   cursor: default;
 }
 
+.row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.row button {
+  flex: 1;
+}
+
+#wall {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.group-name {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.chip {
+  min-width: 38px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.chip.have {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: var(--card);
+  font-weight: 600;
+}
+
+button.ready {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: var(--card);
+}
+
 .counts {
   margin: 0;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
+.status:empty {
+  display: none;
+}
+
 .status {
   margin: 0;
-  min-height: 1.5em;
   text-align: center;
   color: var(--muted);
 }
