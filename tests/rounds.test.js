@@ -10,10 +10,14 @@ const NOW = new Date(2026, 9, 8, 10, 15, 0);
 function setup() {
   const store = new MemoryStore();
   const drive = new FakeDrive();
+  const clock = { now: NOW };
   const rounds = new Rounds({
-    store, drive, inboxFolderId: "inbox", now: () => NOW, random: () => 0.5,
+    store, drive, inboxFolderId: "inbox", now: () => clock.now, random: () => 0.5,
   });
-  return { store, drive, rounds };
+  const later = (seconds) => {
+    clock.now = new Date(clock.now.getTime() + seconds * 1000);
+  };
+  return { store, drive, rounds, later };
 }
 
 test("a round id is the date, the time and a few random characters", () => {
@@ -162,9 +166,10 @@ test("a round remembers which pieces of the wall its photos ticked", async () =>
   await rounds.addPhoto(fakeBlob());
   assert.deepEqual((await rounds.status()).marks, ["sor-1-ajto-1", "sor-1-ajto-2"]);
 
+  // The ticks are the day's: they stay when the round is sent, and start clean tomorrow.
   await rounds.finish();
   await rounds.pump();
-  assert.deepEqual((await rounds.status()).marks, []); // a new round starts clean
+  assert.deepEqual((await rounds.status()).marks, ["sor-1-ajto-1", "sor-1-ajto-2"]);
 });
 
 test("doors clicked empty travel in done.json – even in a round without a photo", async () => {
@@ -185,7 +190,7 @@ test("doors clicked empty travel in done.json – even in a round without a phot
   const done = JSON.parse(await drive.files[0].blob.text());
   assert.deepEqual([done.photos, done.empty], [0, ["sor-1-ajto-3"]]);
   status = await rounds.status();
-  assert.deepEqual([status.open, status.empty], [false, []]);
+  assert.deepEqual([status.open, status.empty], [false, ["sor-1-ajto-3"]]); // shown all day
 });
 
 test("a photo of a door takes back its empty mark; unclicking everything leaves no round", async () => {
@@ -200,4 +205,55 @@ test("a photo of a door takes back its empty mark; unclicking everything leaves 
   await other.rounds.setEmpty("sor-1-ajto-1", false);
   assert.equal((await other.store.getRounds()).length, 0);
   assert.equal((await store.getRounds()).length, 1);
+});
+
+test("a round closes by itself once nothing happened for a while – no button needed", async () => {
+  const { drive, rounds, later } = setup();
+  await rounds.addPhoto(fakeBlob(), ["sor-1-ajto-1:top"]);
+  await rounds.pump();
+
+  later(10);
+  assert.equal(await rounds.finishIdle(30_000), false); // still photographing
+  await rounds.addPhoto(fakeBlob(), ["sor-1-ajto-1:bottom"]);
+  later(29);
+  assert.equal(await rounds.finishIdle(30_000), false);
+  later(2);
+  assert.equal(await rounds.finishIdle(30_000), true);
+  assert.equal(await rounds.finishIdle(30_000), false); // nothing open any more
+
+  await rounds.pump();
+  assert.deepEqual(drive.files.map((f) => f.name), ["foto-01.jpg", "foto-02.jpg", "done.json"]);
+
+  // The next photo simply starts the next round.
+  await rounds.addPhoto(fakeBlob());
+  await rounds.pump();
+  assert.equal(drive.folders.length, 2);
+});
+
+test("an empty round never closes into a done.json", async () => {
+  const { drive, rounds, later } = setup();
+  later(600);
+  assert.equal(await rounds.finishIdle(30_000), false);
+  await rounds.pump();
+  assert.equal(drive.folders.length + drive.files.length, 0);
+});
+
+test("the ticks of the day start clean on the next day", async () => {
+  const { rounds, later } = setup();
+  await rounds.addPhoto(fakeBlob(), ["sor-1-ajto-1:top"]);
+  await rounds.setEmpty("sor-1-ajto-2", true);
+  later(24 * 3600);
+  const status = await rounds.status();
+  assert.deepEqual([status.marks, status.empty], [[], []]);
+});
+
+test("an empty mark that was already sent cannot be taken back by a tap", async () => {
+  const { rounds } = setup();
+  await rounds.setEmpty("sor-1-ajto-3", true);
+  await rounds.finish();
+  await rounds.pump();
+  await assert.rejects(rounds.setEmpty("sor-1-ajto-3", false), /elküldtem/);
+  // …but a photo of the door clears it from the list.
+  await rounds.addPhoto(fakeBlob(), ["sor-1-ajto-3:top"]);
+  assert.deepEqual((await rounds.status()).empty, []);
 });

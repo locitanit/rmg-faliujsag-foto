@@ -10,6 +10,9 @@ import { Rounds } from "./rounds.js";
 import { BrowserStore } from "./store.js";
 
 const RETRY_EVERY_MS = 30_000;
+// A round closes by itself this long after the last photo / tap: there is no "Kész" button.
+const IDLE_CLOSE_MS = 30_000;
+const IDLE_CHECK_MS = 5_000;
 const $ = (id) => document.getElementById(id);
 const configured = Boolean(CONFIG.clientId && CONFIG.inboxFolderId);
 
@@ -42,7 +45,6 @@ const rounds = new Rounds({
   drive: createDrive({ getToken: auth.getToken }),
   inboxFolderId: CONFIG.inboxFolderId,
 });
-let finishing = false; // "Kész" was tapped: say so once the round is really up
 let pending = null; // a photo with warnings, waiting for "Újra fotózom" / "Így is jó"
 const ITEM_COUNT = allItems(GROUPS).length;
 
@@ -92,9 +94,9 @@ function renderWall(marks, emptyDoors) {
     wall.append(box);
   }
   const halves = half ? ` (+ ${half} félig)` : "";
-  $("wall-title").textContent = `Megvan ebben a körben: ${whole} / ${ITEM_COUNT}${halves}`;
+  const all = whole === ITEM_COUNT ? " – minden megvan ✓" : "";
+  $("wall-title").textContent = `Ma megvan: ${whole} / ${ITEM_COUNT}${halves}${all}`;
   $("wall-legend").hidden = half === 0;
-  $("done").classList.toggle("ready", whole === ITEM_COUNT);
 }
 
 async function toggleEmpty(item, photographed, isEmpty) {
@@ -103,8 +105,7 @@ async function toggleEmpty(item, photographed, isEmpty) {
     return;
   }
   await rounds.setEmpty(item.id, !isEmpty);
-  finishing = false;
-  say("");
+  say(isEmpty ? "" : "Rendben, üresnek jelöltem – magától elküldöm.");
   await render();
 }
 
@@ -133,7 +134,6 @@ async function keep(file, verdict) {
   } else {
     $("last").textContent = "";
   }
-  finishing = false;
   await sync();
 }
 
@@ -166,14 +166,10 @@ async function render() {
   const status = await rounds.status();
   $("setup").hidden = configured;
   $("signin-box").hidden = !configured || auth.signedIn();
-  $("done").disabled = !status.open || (status.taken === 0 && status.empty.length === 0);
   renderWall(status.marks, status.empty);
-  if (status.taken === 0 && status.waiting === 0) {
-    $("counts").textContent = "";
-  } else {
-    const waiting = status.waiting ? ` · várakozik: ${status.waiting}` : "";
-    $("counts").textContent = `Ebben a körben ${status.taken} fotó · feltöltve: ${status.uploaded}${waiting}`;
-  }
+  $("counts").textContent = status.waiting
+    ? `${status.waiting} fotó vár feltöltésre a telefonon`
+    : "";
   return status;
 }
 
@@ -189,11 +185,8 @@ async function sync() {
     say(result.message, "bad");
   } else if (result.state !== "idle") {
     say(result.message, result.state === "blocked" ? "bad" : "");
-  } else if (finishing && !after.closing) {
-    finishing = false;
-    say("Kész, a kör felment! Kb. 10 perc múlva látszik a faliújságon.", "ok");
-  } else {
-    say("Minden fotó felment. Jöhet a következő, vagy nyomd meg a Kész gombot.", "ok");
+  } else if (!after.closing) {
+    say("Minden felment. Kb. 10 perc múlva látszik a faliújságon.", "ok");
   }
 }
 
@@ -246,24 +239,6 @@ $("signin").addEventListener(
   }),
 );
 
-$("done").addEventListener(
-  "click",
-  guard(async () => {
-    // "Kész" signs in by itself. The pop-up must be opened first, straight from the tap –
-    // after an await the browser would not count it as the user's doing and block it.
-    let signing = null;
-    if (configured && !auth.signedIn()) {
-      rememberHint();
-      signing = auth.signIn();
-      signing.catch(() => {}); // reported below, after the round is safely closed
-    }
-    await rounds.finish();
-    finishing = true;
-    if (signing) await signing; // a failure is shown; the round waits and goes up later
-    await sync();
-  }),
-);
-
 window.addEventListener("online", guard(sync));
 document.addEventListener(
   "visibilitychange",
@@ -272,6 +247,12 @@ document.addEventListener(
   }),
 );
 setInterval(guard(sync), RETRY_EVERY_MS);
+setInterval(
+  guard(async () => {
+    if (!pending && (await rounds.finishIdle(IDLE_CLOSE_MS))) await sync();
+  }),
+  IDLE_CHECK_MS,
+);
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
@@ -280,9 +261,9 @@ if ("serviceWorker" in navigator) {
 $("hint").value = savedHint();
 
 guard(async () => {
+  await rounds.finishIdle(IDLE_CLOSE_MS); // a round left open last time
   const status = await render();
-  finishing = status.closing;
-  if (status.waiting && !auth.signedIn()) {
-    say(`${status.waiting} fotó vár feltöltésre. Lépj be, és felmennek.`);
+  if ((status.waiting || status.closing) && !auth.signedIn()) {
+    say("Van, ami még a telefonon vár. Lépj be, és felmegy.");
   }
 })();

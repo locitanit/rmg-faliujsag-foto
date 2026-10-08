@@ -2,7 +2,8 @@
 // A photo is deleted from here the moment it is on the drive.
 
 const DB_NAME = "faliujsag-foto";
-const DB_VERSION = 1;
+const DB_VERSION = 1; // never raise it lightly: an old tab left open blocks the upgrade
+const WALL_KEY = "faliujsag-foto.wall"; // the check-list of the day: small, so localStorage
 
 function wait(request) {
   return new Promise((resolve, reject) => {
@@ -49,5 +50,19 @@ export class BrowserStore {
   }
   deletePhoto(id) {
     return this._run("photos", "readwrite", (s) => s.delete(id));
+  }
+  async getMeta() {
+    try {
+      return JSON.parse(localStorage.getItem(WALL_KEY) ?? "null");
+    } catch {
+      return null; // private mode or a broken entry: the list simply starts clean
+    }
+  }
+  async putMeta(meta) {
+    try {
+      localStorage.setItem(WALL_KEY, JSON.stringify(meta));
+    } catch {
+      // not remembered: only the ticks are lost, never a photo
+    }
   }
 }

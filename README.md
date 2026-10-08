@@ -20,8 +20,11 @@ matrica). A „túl messze" és az „életlen" küszöb még becslés; parafat�
   kimarad, pontosan ezzel a fiókkal lép be. (Azt, hogy a telefon melyik Chrome-profilban
   nyitja meg az oldalt, a weboldal nem tudja irányítani.) A `config.js` `hostedDomain`
   értékével a választó az iskola fiókjaira szűkíthető.
-- **Nem kell külön belépni:** a **Kész** gomb magától beléptet, és akkor megy fel a kör.
-  Aki fotózás közben szeretné látni a feltöltést, előre is megnyomhatja a Belépést.
+- **Nincs „Kész" gomb, semmit nem kell lezárni.** Belépés után minden fotó azonnal felmegy.
+  A kör magától lezárul 30 másodperccel az utolsó fotó / koppintás után (akkor megy fel a
+  `done.json`), és ha ez elmaradna (bezárt app, nincs net), a feldolgozó 3 perc csend után
+  így is beolvassa a mappa fotóit. Belépni óránként egyszer kell (a böngésző csak
+  koppintásra enged belépő ablakot nyitni).
 - **Fotó** gomb → a telefon kamerája, teljes felbontás. A kép nem kerül a galériába.
 - A fotó előbb a telefonon vár (IndexedDB), aztán felmegy, és a telefonról törlődik.
   Net nélkül sem vész el: magától újrapróbálja (30 mp-enként, és amikor visszajön a net).
@@ -32,8 +35,8 @@ matrica). A „túl messze" és az „életlen" küszöb még becslés; parafat�
   - szól, ha **nincs elég matrica**, ha **túl messziről** készült (3,5 px/mm alatt), vagy ha
     **életlen**. Ilyenkor választani lehet: „Újra fotózom" (a kép eldobva) vagy „Így is jó".
   Ez csak tanács: ha az ellenőrzés nem sikerül, a fotó akkor is megmarad.
-- **Pipalista:** a fal 17 része (12 ajtó + a két tábla 3 + 2 része); a Kész gomb zöld, ha
-  mind megvan – de hiányosan is beküldhető.
+- **Pipalista:** a fal 17 része (12 ajtó + a két tábla 3 + 2 része); a pipák **egész nap** megmaradnak
+  (a körök közben a háttérben lezárulnak), másnap tiszta lappal indul.
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó
   **teteje** (▲, a csempe felül zöld); alsó + középső = az **alja** (▼). A kettő együtt (vagy
   egy egész-ajtós fotó) adja a pipát. A parafatábla része mindig egészben számít.
@@ -41,8 +44,8 @@ matrica). A „túl messze" és az „életlen" küszöb még becslés; parafat�
   koppintva „üres"-nek jelölhető (még egy koppintás visszavonja). A feldolgozó ilyenkor az
   ajtó papírjait fotó nélkül „lekerült"-re állítja. Ha ugyanarról az ajtóról fotó is készül
   a körben, a fotó számít. Parafatáblán nincs ilyen.
-- **Kész** gomb → `done.json` a kör mappájába: darabszám, időpont, és az üresnek jelölt
-  ajtók (`"empty": ["sor-1-ajto-3"]`). A feldolgozó csak a `done.json`-nal lezárt kört
+- A kör végén `done.json` megy a kör mappájába: darabszám, időpont, és az üresnek jelölt
+  ajtók (`"empty": ["sor-1-ajto-3"]`). A feldolgozó a `done.json`-nal lezárt kört azonnal
   olvassa be. Fotó nélküli kör is beküldhető, ha van benne üresnek jelölt ajtó.
 - Kezdőképernyőre tehető (PWA), a héja net nélkül is megnyílik.
 
@@ -96,7 +99,7 @@ python -m http.server 8765
 | `config.js` | a két beállítandó érték + a kért engedély |
 | `auth.js` | Google-belépés |
 | `drive.js` | mappa létrehozása, feltöltés; időkorlát, újrapróbálás, magyar hibaüzenetek |
-| `rounds.js` | kör, várakozó sor, `done.json`, a kör pipái |
+| `rounds.js` | kör (magától záródik), várakozó sor, `done.json`, a nap pipái |
 | `aruco.js` | saját, függőség nélküli ArUco-kereső + élességmérés |
 | `check.js` | mit mutat a fotó, elég közeli-e, éles-e (a figyelmeztetések szövege) |
 | `photo.js` | a fotó megnyitása a böngészőben az ellenőrzéshez |

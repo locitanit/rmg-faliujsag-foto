@@ -23,6 +23,12 @@ export class MemoryStore {
   async deletePhoto(id) {
     this.photos.delete(id);
   }
+  async getMeta() {
+    return this.meta ? structuredClone(this.meta) : null;
+  }
+  async putMeta(meta) {
+    this.meta = structuredClone(meta);
+  }
 }
 
 export function response(status, body = {}, headers = {}) {
