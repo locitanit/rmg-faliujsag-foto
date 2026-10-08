@@ -103,6 +103,22 @@ button:disabled {
   cursor: default;
 }
 
+#signin-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#hint {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  width: 100%;
+}
+
 .row {
   display: flex;
   gap: 10px;

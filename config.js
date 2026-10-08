@@ -15,4 +15,9 @@ export const CONFIG = {
   // the inbox folder cannot be reached (W1 in the plan), the fallback is
   // "https://www.googleapis.com/auth/drive" – a far wider permission, decide it knowingly.
   scope: "https://www.googleapis.com/auth/drive.file",
+
+  // Optional: the school's Google domain (the part after the @). With it the account
+  // chooser only offers accounts of the school. Empty = no restriction here (the Internal
+  // OAuth project refuses other accounts anyway).
+  hostedDomain: "",
 };

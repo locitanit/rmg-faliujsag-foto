@@ -35,7 +35,17 @@
         </ul>
       </section>
 
-      <button id="signin" class="secondary" hidden>Belépés az iskolai Google-fiókkal</button>
+      <section id="signin-box" class="box" hidden>
+        <label for="hint" class="small">
+          Iskolai e-mail címed (csak ez a telefon jegyzi meg – így mindig ezzel a fiókkal lép be):
+        </label>
+        <input id="hint" type="email" inputmode="email" autocomplete="email" autocapitalize="off"
+               spellcheck="false" placeholder="nev@iskola.hu" />
+        <button id="signin" class="secondary">Belépés az iskolai Google-fiókkal</button>
+        <p class="small">
+          Nem muszáj előre belépni: a <b>Kész</b> gomb magától beléptet, és akkor megy fel minden.
+        </p>
+      </section>
 
       <label id="shoot" class="primary">
         📷 Fotó

@@ -13,7 +13,30 @@ const RETRY_EVERY_MS = 30_000;
 const $ = (id) => document.getElementById(id);
 const configured = Boolean(CONFIG.clientId && CONFIG.inboxFolderId);
 
-const auth = createAuth(CONFIG);
+const HINT_KEY = "faliujsag-foto.account"; // on this phone only; never uploaded anywhere
+
+function savedHint() {
+  try {
+    return localStorage.getItem(HINT_KEY) ?? "";
+  } catch {
+    return ""; // private mode: simply no remembered account
+  }
+}
+
+function rememberHint() {
+  const typed = $("hint").value.trim();
+  if (typed && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(typed)) {
+    throw new Error("Ez nem e-mail cím. Írd be az iskolai címedet, vagy hagyd üresen.");
+  }
+  try {
+    if (typed) localStorage.setItem(HINT_KEY, typed);
+    else localStorage.removeItem(HINT_KEY);
+  } catch {
+    // not remembered, but this sign-in still uses it (the field keeps the text)
+  }
+}
+
+const auth = createAuth({ ...CONFIG, getHint: () => $("hint").value.trim() || savedHint() });
 const rounds = new Rounds({
   store: new BrowserStore(),
   drive: createDrive({ getToken: auth.getToken }),
@@ -142,7 +165,7 @@ function say(text, kind = "") {
 async function render() {
   const status = await rounds.status();
   $("setup").hidden = configured;
-  $("signin").hidden = !configured || auth.signedIn();
+  $("signin-box").hidden = !configured || auth.signedIn();
   $("done").disabled = !status.open || (status.taken === 0 && status.empty.length === 0);
   renderWall(status.marks, status.empty);
   if (status.taken === 0 && status.waiting === 0) {
@@ -215,6 +238,7 @@ $("keep").addEventListener(
 $("signin").addEventListener(
   "click",
   guard(async () => {
+    rememberHint();
     await auth.signIn();
     say("");
     await sync();
@@ -225,8 +249,17 @@ $("signin").addEventListener(
 $("done").addEventListener(
   "click",
   guard(async () => {
+    // "Kész" signs in by itself. The pop-up must be opened first, straight from the tap –
+    // after an await the browser would not count it as the user's doing and block it.
+    let signing = null;
+    if (configured && !auth.signedIn()) {
+      rememberHint();
+      signing = auth.signIn();
+      signing.catch(() => {}); // reported below, after the round is safely closed
+    }
     await rounds.finish();
     finishing = true;
+    if (signing) await signing; // a failure is shown; the round waits and goes up later
     await sync();
   }),
 );
@@ -243,6 +276,8 @@ setInterval(guard(sync), RETRY_EVERY_MS);
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
+
+$("hint").value = savedHint();
 
 guard(async () => {
   const status = await render();

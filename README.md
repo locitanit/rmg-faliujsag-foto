@@ -15,6 +15,13 @@ matrica). A „túl messze" és az „életlen" küszöb még becslés; parafat�
 ## Mit tud
 
 - Belépés iskolai Google-fiókkal (Google Identity Services; a token csak a memóriában él).
+- **Mindig a jó fiókkal:** a belépés előtt beírható az iskolai e-mail cím. Csak a telefon
+  jegyzi meg (`localStorage`), és a Google-nek `login_hint`-ként megy: a fiókválasztó
+  kimarad, pontosan ezzel a fiókkal lép be. (Azt, hogy a telefon melyik Chrome-profilban
+  nyitja meg az oldalt, a weboldal nem tudja irányítani.) A `config.js` `hostedDomain`
+  értékével a választó az iskola fiókjaira szűkíthető.
+- **Nem kell külön belépni:** a **Kész** gomb magától beléptet, és akkor megy fel a kör.
+  Aki fotózás közben szeretné látni a feltöltést, előre is megnyomhatja a Belépést.
 - **Fotó** gomb → a telefon kamerája, teljes felbontás. A kép nem kerül a galériába.
 - A fotó előbb a telefonon vár (IndexedDB), aztán felmegy, és a telefonról törlődik.
   Net nélkül sem vész el: magától újrapróbálja (30 mp-enként, és amikor visszajön a net).

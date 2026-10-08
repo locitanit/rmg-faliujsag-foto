@@ -6,7 +6,14 @@ import { DriveError } from "./drive.js";
 
 const SAFETY_MS = 60_000; // treat the token as expired a minute early
 
-export function createAuth({ clientId, scope }) {
+/**
+ * hostedDomain: the school's Google domain – the account chooser then only offers accounts
+ *   of that domain (optional).
+ * getHint: gives the e-mail address to sign in with (remembered on this phone only). With
+ *   it Google skips the chooser and takes exactly that account – a phone with a private
+ *   and a school account no longer signs in with the wrong one.
+ */
+export function createAuth({ clientId, scope, hostedDomain = "", getHint = () => "" }) {
   let token = "";
   let expiresAt = 0;
 
@@ -38,12 +45,19 @@ export function createAuth({ clientId, scope }) {
           reject(new Error("A Google-belépés nem töltődött be. Van internet? Töltsd újra az oldalt."));
           return;
         }
+        const hint = getHint();
         const client = gis.initTokenClient({
           client_id: clientId,
           scope,
+          ...(hint ? { login_hint: hint } : {}),
+          ...(hostedDomain ? { hd: hostedDomain } : {}),
           callback: (answer) => {
             if (answer.error || !answer.access_token) {
-              reject(new Error("A belépés nem sikerült. Az iskolai fiókodat válaszd."));
+              reject(
+                new Error(
+                  "A belépés nem sikerült. Az iskolai fiókodat válaszd – ha a telefon másik fiókot kínál, írd be fent az iskolai e-mail címedet.",
+                ),
+              );
               return;
             }
             token = answer.access_token;
