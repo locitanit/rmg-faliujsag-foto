@@ -26,5 +26,5 @@ export const CONFIG = {
   // app's address must be added to the OAuth client as an "Authorized redirect URI"
   // (exactly, with the trailing slash) – otherwise Google shows an error page instead of
   // the app. false: the pop-up sign-in, one tap on "Belépés" per hour.
-  redirectSignIn: false,
+  redirectSignIn: true,
 };
