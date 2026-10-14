@@ -11,7 +11,7 @@ Nincs szerver, nincs build: sima statikus fájlok (GitHub Pages-re való).
 feltöltés élő fiókkal kipróbálva (gépről és telefonról). A fotó-ellenőrzés telefonon, valódi ajtón
 kipróbálva (2026-10-08: egész ajtó és két fél fotó – az 1. ajtón, mert csak azon van
 matrica). A „túl messze" és az „életlen" küszöb még becslés; parafatáblán és oldalfalon nem volt
-próba (2026-10-14 óta a végleges kiosztást tudja: oldalfal #150–155, táblák #200–229, `DICT_4X4_250`).
+próba (2026-10-14 óta a végleges kiosztást tudja: oldalfal #42–47, táblák #48–69, `DICT_4X4_250`).
 Az átirányításos belépés (lent) 2026-10-08 este lett bekapcsolva, élő fiókkal kipróbálva:
 működik. Vészfék: a `config.js`-ben `redirectSignIn: false` visszaadja a felugró ablakos
 belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-terv.md`,
@@ -47,7 +47,7 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
     **életlen**. Ilyenkor választani lehet: „Újra fotózom" (a kép eldobva) vagy „Így is jó".
   Ez csak tanács: ha az ellenőrzés nem sikerül, a fotó akkor is megmarad.
 - **Pipalista:** a fal 27 része balról jobbra: 2 × 6 ajtó, az **oldalfal**, a nagy tábla 8 darabja
-  (felső sor 1–4, alsó sor 1–4: #200–201, 201–202, …) és a kis tábla 6 darabja (#220–221, …). A pipák
+  (felső sor 1–4, alsó sor 1–4: #48–49, 49–50, …) és a kis tábla 6 darabja (#60–61, …). A pipák
   **egész nap** megmaradnak (a körök közben a háttérben lezárulnak), másnap tiszta lappal indul.
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó
   **teteje** (a csempe felül zöld); alsó + középső = az **alja** (alul zöld). A kettő együtt (vagy

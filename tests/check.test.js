@@ -21,7 +21,7 @@ test("the wall is listed left to right: two cabinet rows, the side wall, the boa
   // A board piece = two neighbouring stickers of the top or the bottom edge.
   const small = GROUPS[4].items;
   assert.deepEqual(small.map((i) => i.stickers), [
-    [220, 221], [221, 222], [222, 223], [224, 225], [225, 226], [226, 227],
+    [60, 61], [61, 62], [62, 63], [64, 65], [65, 66], [66, 67],
   ]);
   assert.deepEqual(small.map((i) => i.label).slice(0, 4), [
     "felső sor, 1. rész", "felső sor, 2. rész", "felső sor, 3. rész", "alsó sor, 1. rész",
@@ -30,10 +30,10 @@ test("the wall is listed left to right: two cabinet rows, the side wall, the boa
 
 test("the side wall is a door: 2 + 2 stickers, and it can be reported empty", () => {
   const [side] = GROUPS[2].items;
-  assert.deepEqual(side.columns, [[150, 151, 152], [153, 154, 155]]);
+  assert.deepEqual(side.columns, [[42, 43, 44], [45, 46, 47]]);
   assert.equal(side.canBeEmpty, true);
-  assert.deepEqual(coveredItems([150, 151, 153, 154], GROUPS), ["oldalfal"]);
-  assert.deepEqual(coveredItems([150, 151, 152, 153], GROUPS), []);
+  assert.deepEqual(coveredItems([42, 43, 45, 46], GROUPS), ["oldalfal"]);
+  assert.deepEqual(coveredItems([42, 43, 44, 45], GROUPS), []);
 });
 
 test("a door is ticked by two stickers from each of its sides", () => {
@@ -48,22 +48,22 @@ test("one photo can tick two doors, and a part of a cork board", () => {
     "sor-1-ajto-1",
     "sor-1-ajto-2",
   ]);
-  assert.deepEqual(coveredItems([201, 202], GROUPS), ["parafa-1-felso-2"]);
-  assert.deepEqual(coveredItems([200, 201, 202, 210], GROUPS), [
+  assert.deepEqual(coveredItems([49, 50], GROUPS), ["parafa-1-felso-2"]);
+  assert.deepEqual(coveredItems([48, 49, 50, 58], GROUPS), [
     "parafa-1-felso-1",
     "parafa-1-felso-2",
   ]);
-  assert.deepEqual(coveredItems([226, 227, 229], GROUPS), ["parafa-2-also-3"]);
-  assert.deepEqual(coveredItems([200, 202], GROUPS), []); // not neighbours: no piece
-  assert.deepEqual(coveredItems([200, 210], GROUPS), []); // a corner and the side: no piece
+  assert.deepEqual(coveredItems([66, 67, 69], GROUPS), ["parafa-2-also-3"]);
+  assert.deepEqual(coveredItems([48, 50], GROUPS), []); // not neighbours: no piece
+  assert.deepEqual(coveredItems([48, 58], GROUPS), []); // a corner and the side: no piece
 });
 
 test("a board piece photo has no warnings and is named", () => {
-  const result = judged([221, 222]);
+  const result = judged([61, 62]);
   assert.deepEqual(result.items, ["parafa-2-felso-2"]);
   assert.deepEqual(result.warnings, []);
   assert.deepEqual(result.labels, ["Kis parafatábla – felső sor, 2. rész"]);
-  assert.deepEqual(judged([221]).warnings.map((w) => w.code), ["too-few"]);
+  assert.deepEqual(judged([61]).warnings.map((w) => w.code), ["too-few"]);
 });
 
 test("a good photo has no warnings and says what it shows", () => {
@@ -83,8 +83,8 @@ test("no sticker at all, or too few for anything, is a warning", () => {
 
 test("stickers this app does not know are not counted", () => {
   assert.deepEqual(judged([90, 91, 92, 93]).warnings.map((w) => w.code), ["no-markers"]);
-  // 42–55 were the stickers of the old board plan: never glued, not known any more.
-  assert.deepEqual(judged([42, 43, 44, 45]).warnings.map((w) => w.code), ["no-markers"]);
+  // 70 and up are printed on the sheets but not used on the wall.
+  assert.deepEqual(judged([150, 151, 200, 201]).warnings.map((w) => w.code), ["no-markers"]);
 });
 
 test("small stickers mean the photo was taken from too far", () => {
@@ -120,7 +120,7 @@ test("a door photographed in two halves: each photo says which half it shows", (
 
 test("a piece of a cork board is always whole", () => {
   const { coveredParts } = checkModule;
-  assert.deepEqual(coveredParts([205, 206], GROUPS), [{ id: "parafa-1-also-1", top: true, bottom: true }]);
+  assert.deepEqual(coveredParts([53, 54], GROUPS), [{ id: "parafa-1-also-1", top: true, bottom: true }]);
 });
 
 test("the verdict carries a mark per half, and names the half in its label", () => {

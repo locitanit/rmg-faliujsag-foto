@@ -233,14 +233,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            150,
-            151,
-            152
+            42,
+            43,
+            44
           ],
           [
-            153,
-            154,
-            155
+            45,
+            46,
+            47
           ]
         ]
       }
@@ -254,64 +254,64 @@ export const GROUPS = [
         "id": "parafa-1-felso-1",
         "label": "felső sor, 1. rész",
         "stickers": [
-          200,
-          201
+          48,
+          49
         ]
       },
       {
         "id": "parafa-1-felso-2",
         "label": "felső sor, 2. rész",
         "stickers": [
-          201,
-          202
+          49,
+          50
         ]
       },
       {
         "id": "parafa-1-felso-3",
         "label": "felső sor, 3. rész",
         "stickers": [
-          202,
-          203
+          50,
+          51
         ]
       },
       {
         "id": "parafa-1-felso-4",
         "label": "felső sor, 4. rész",
         "stickers": [
-          203,
-          204
+          51,
+          52
         ]
       },
       {
         "id": "parafa-1-also-1",
         "label": "alsó sor, 1. rész",
         "stickers": [
-          205,
-          206
+          53,
+          54
         ]
       },
       {
         "id": "parafa-1-also-2",
         "label": "alsó sor, 2. rész",
         "stickers": [
-          206,
-          207
+          54,
+          55
         ]
       },
       {
         "id": "parafa-1-also-3",
         "label": "alsó sor, 3. rész",
         "stickers": [
-          207,
-          208
+          55,
+          56
         ]
       },
       {
         "id": "parafa-1-also-4",
         "label": "alsó sor, 4. rész",
         "stickers": [
-          208,
-          209
+          56,
+          57
         ]
       }
     ]
@@ -324,48 +324,48 @@ export const GROUPS = [
         "id": "parafa-2-felso-1",
         "label": "felső sor, 1. rész",
         "stickers": [
-          220,
-          221
+          60,
+          61
         ]
       },
       {
         "id": "parafa-2-felso-2",
         "label": "felső sor, 2. rész",
         "stickers": [
-          221,
-          222
+          61,
+          62
         ]
       },
       {
         "id": "parafa-2-felso-3",
         "label": "felső sor, 3. rész",
         "stickers": [
-          222,
-          223
+          62,
+          63
         ]
       },
       {
         "id": "parafa-2-also-1",
         "label": "alsó sor, 1. rész",
         "stickers": [
-          224,
-          225
+          64,
+          65
         ]
       },
       {
         "id": "parafa-2-also-2",
         "label": "alsó sor, 2. rész",
         "stickers": [
-          225,
-          226
+          65,
+          66
         ]
       },
       {
         "id": "parafa-2-also-3",
         "label": "alsó sor, 3. rész",
         "stickers": [
-          226,
-          227
+          66,
+          67
         ]
       }
     ]
