@@ -43,9 +43,9 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
   - szól, ha **nincs elég matrica**, ha **túl messziről** készült (3,5 px/mm alatt), vagy ha
     **életlen**. Ilyenkor választani lehet: „Újra fotózom" (a kép eldobva) vagy „Így is jó".
   Ez csak tanács: ha az ellenőrzés nem sikerül, a fotó akkor is megmarad.
-- **Pipalista:** a fal 17 része (12 ajtó + a két tábla 3 + 2 része – **a régi elrendezés**: a 2026-10-14-i
-  végleges matricakiosztás, `rmg_tools/docs/faliujsag/`, 18 ajtót + szekrényoldalt + 2 táblát ír; a feldolgozó
-  átírása után a `tools/make_data.py` újrafuttatásával cserélődik); a pipák **egész nap** megmaradnak
+- **Pipalista:** a fal 17 része (12 ajtó + a két tábla 3 + 2 része). A 2026-10-14-i végleges kiosztás szerint az
+  ajtók maradnak, de jön egy **oldalfal** és a **táblák új kiosztása** (fél-tábla fotók) – a feldolgozó átírása
+  után a `tools/make_data.py` újrafuttatásával cserélődik; a pipák **egész nap** megmaradnak
   (a körök közben a háttérben lezárulnak), másnap tiszta lappal indul.
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó
   **teteje** (a csempe felül zöld); alsó + középső = az **alja** (alul zöld). A kettő együtt (vagy
