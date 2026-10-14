@@ -5,6 +5,8 @@
 import { MARKER_MM } from "./layout.js";
 
 const MIN_MARKERS_PER_COLUMN = 2; // the processor's rule (board_worker/doors.py)
+// A piece of a cork board: the two neighbouring stickers of its edge (layout.js).
+const MIN_BOARD_STICKERS = 2;
 // The first real door photos were 4.6 px/mm and read fine; well under that the small print goes.
 export const MIN_PX_PER_MM = 3.5;
 // See aruco.sharpness: about 1 / (2.5 · the smear in pixels). Below this the edges are
@@ -17,14 +19,25 @@ export function allItems(groups) {
   );
 }
 
+/** Every sticker of a check-list item: a door's columns, or a board piece's stickers. */
+export function itemStickers(item) {
+  return item.stickers ?? item.columns.flat();
+}
+
+function boardPieceSeen(item, seen) {
+  return item.stickers.filter((id) => seen.has(id)).length >= MIN_BOARD_STICKERS;
+}
+
 /** The check-list items a photo with these sticker ids ticks. */
 export function coveredItems(ids, groups) {
   const seen = new Set(ids);
   return allItems(groups)
     .filter((item) =>
-      item.columns.every(
-        (column) => column.filter((id) => seen.has(id)).length >= MIN_MARKERS_PER_COLUMN,
-      ),
+      item.stickers
+        ? boardPieceSeen(item, seen)
+        : item.columns.every(
+            (column) => column.filter((id) => seen.has(id)).length >= MIN_MARKERS_PER_COLUMN,
+          ),
     )
     .map((item) => item.id);
 }
@@ -34,13 +47,17 @@ export function coveredItems(ids, groups) {
  *
  * A door may be photographed in two closer photos. Its columns have three stickers (top,
  * middle, bottom): a photo reaches the top half if it holds the top sticker and one below
- * it in both columns, and the bottom half likewise. A board part has two stickers per
- * column, so a photo that counts for it always shows all of it.
+ * it in both columns, and the bottom half likewise. A piece of a cork board is half a
+ * board already: a photo that counts for it always shows all of it.
  */
 export function coveredParts(ids, groups) {
   const seen = new Set(ids);
   const parts = [];
   for (const item of allItems(groups)) {
+    if (item.stickers) {
+      if (boardPieceSeen(item, seen)) parts.push({ id: item.id, top: true, bottom: true });
+      continue;
+    }
     const levels = item.columns.map((column) =>
       column.map((id, level) => (seen.has(id) ? level : -1)).filter((level) => level >= 0),
     );
@@ -63,7 +80,7 @@ export const markOf = (id, half) => `${id}:${half}`;
  * sharpness: aruco.sharpness of the sharpest sticker, or null when it could not be measured.
  */
 export function judge({ markers, sharpness, groups }) {
-  const known = new Set(allItems(groups).flatMap((item) => item.columns.flat()));
+  const known = new Set(allItems(groups).flatMap(itemStickers));
   const ours = markers.filter((marker) => known.has(marker.id));
   const parts = coveredParts(ours.map((marker) => marker.id), groups);
   const items = parts.map((part) => part.id);
@@ -91,7 +108,7 @@ export function judge({ markers, sharpness, groups }) {
     if (items.length === 0) {
       warnings.push({
         code: "too-few",
-        text: `Csak ${ours.length} matricát látok. Egy ajtóhoz mindkét oldaláról legalább 2–2 kell.`,
+        text: `Csak ${ours.length} matricát látok. Egy ajtóhoz mindkét oldaláról legalább 2–2 kell, a parafatáblánál a szélén 2 szomszédos.`,
       });
     }
     if (pxPerMm < MIN_PX_PER_MM) {

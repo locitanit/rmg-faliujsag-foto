@@ -21,7 +21,9 @@ function detect(name) {
   return { picture, markers, ids: markers.map((m) => m.id).sort((a, b) => a - b) };
 }
 
-for (const name of ["door", "board-left", "two-doors-far", "door-sideways", "door-tilted"]) {
+for (const name of [
+  "door", "board-top-middle", "board-top-left", "two-doors-far", "door-sideways", "door-tilted",
+]) {
   test(`finds exactly the stickers of the picture: ${name}`, () => {
     const { picture, ids } = detect(name);
     assert.deepEqual(ids, picture.ids);
