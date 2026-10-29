@@ -74,7 +74,7 @@ function stateText(top, bottom, isEmpty) {
 /**
  * The wall map of this batch: every door and board piece drawn roughly to scale (layout.js
  * boxes, in mm), filled where a photo of the batch shows it, crossed where it was tapped
- * empty. Cabinets on the first line, boards on the second, both at the same scale.
+ * empty. Left row, right row, then side wall + boards – every line at the same scale.
  */
 function renderWall(marks, emptyDoors) {
   const have = new Set(marks);

@@ -159,7 +159,7 @@ export const GROUPS = [
   {
     "id": "sor-1",
     "name": "Jobb szekrénysor",
-    "line": 1,
+    "line": 2,
     "size": {
       "w": 2646,
       "h": 923
@@ -308,7 +308,7 @@ export const GROUPS = [
   {
     "id": "oldalfal",
     "name": "Oldalfal",
-    "line": 1,
+    "line": 3,
     "size": {
       "w": 404,
       "h": 909
@@ -342,7 +342,7 @@ export const GROUPS = [
   {
     "id": "parafa-1",
     "name": "Nagy parafatábla",
-    "line": 2,
+    "line": 3,
     "size": {
       "w": 2050,
       "h": 940
@@ -465,7 +465,7 @@ export const GROUPS = [
   {
     "id": "parafa-2",
     "name": "Kis parafatábla",
-    "line": 2,
+    "line": 3,
     "size": {
       "w": 1440,
       "h": 940

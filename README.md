@@ -48,9 +48,9 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
   - szól, ha **nincs elég matrica**, ha **túl messziről** készült (3,5 px/mm alatt), vagy ha
     **életlen**. Ilyenkor választani lehet: „Újra fotózom" (a kép eldobva) vagy „Így is jó".
   Ez csak tanács: ha az ellenőrzés nem sikerül, a fotó akkor is megmarad.
-- **A fal térképe:** a fal 27 része nagyjából méretarányosan – fent a bal és a jobb szekrénysor
-  (6–6 ajtó) és az oldalfal, alatta (ugyanakkora léptékben) a nagy tábla 8 darabja (felső sor
-  1–4, alsó sor 1–4) és a kis tábla 6 darabja. A méretek a `zones.json`-ból jönnek
+- **A fal térképe:** a fal 27 része nagyjából méretarányosan, három sorban, ugyanakkora
+  léptékben: 1. a bal szekrénysor (6 ajtó), 2. a jobb szekrénysor (6 ajtó), 3. az oldalfal, a
+  nagy tábla 8 darabja (felső sor 1–4, alsó sor 1–4) és a kis tábla 6 darabja. A méretek a `zones.json`-ból jönnek
   (`layout.js`: `size`, `box` mm-ben). A legutóbbi fotón felismert rész keretet kap. A térkép
   **csak az aktuális kört** mutatja: Befejezés után kiürül.
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó

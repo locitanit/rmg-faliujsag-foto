@@ -288,7 +288,7 @@ button:disabled {
 .map-line {
   display: flex;
   align-items: flex-end;
-  gap: 6px;
+  gap: 12px;
 }
 
 .map-group {
@@ -301,21 +301,13 @@ button:disabled {
   width: 100%;
 }
 
+/* The narrow side wall's name may reach a little over the gap beside it. */
 .group-name {
   margin-top: 2px;
-  overflow: hidden;
   font-size: 11px;
   line-height: 1.3;
   color: var(--muted);
-  text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* The narrow side wall at the end of the line: its name may reach back over the gap. */
-.map-group:last-child .group-name {
-  overflow: visible;
-  direction: rtl;
-  text-overflow: clip;
 }
 
 /* A door or a board piece, placed by app.js in % of its group. */

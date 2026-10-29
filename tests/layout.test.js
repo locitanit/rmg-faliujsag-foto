@@ -3,10 +3,10 @@ import { test } from "node:test";
 
 import { GROUPS } from "../layout.js";
 
-test("the wall map: cabinets on line 1, boards on line 2, left to right", () => {
+test("the wall map: left row, right row, then side wall + boards", () => {
   assert.deepEqual(
     GROUPS.map((group) => [group.id, group.line]),
-    [["sor-2", 1], ["sor-1", 1], ["oldalfal", 1], ["parafa-1", 2], ["parafa-2", 2]],
+    [["sor-2", 1], ["sor-1", 2], ["oldalfal", 3], ["parafa-1", 3], ["parafa-2", 3]],
   );
 });
 
