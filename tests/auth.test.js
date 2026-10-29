@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 
-import { createAuth } from "../auth.js";
+import { createAuth, loadGis, notLoadedMessage } from "../auth.js";
 
 // A stand-in for Google Identity Services: remembers how it was asked, answers at once.
 function fakeGoogle(answer = { access_token: "tok", expires_in: 3600 }) {
@@ -56,4 +56,31 @@ test("a refused sign-in is a Hungarian message, and nobody is signed in", async 
   await assert.rejects(auth.signIn(), /belépés/);
   assert.equal(auth.signedIn(), false);
   await assert.rejects(auth.getToken(), (error) => error.auth === true);
+});
+
+test("a missing Google script is loaded once more before giving up", async () => {
+  let loads = 0;
+  const auth = createAuth({
+    clientId: "c", scope: "s",
+    load: async () => { loads += 1; fakeGoogle(); return true; },
+  });
+  await auth.signIn();
+  assert.equal(loads, 1);
+  assert.equal(auth.signedIn(), true);
+});
+
+test("if the script still cannot be had, an iPhone home-screen app is sent to Safari", async () => {
+  const never = async () => false;
+  await assert.rejects(
+    createAuth({ clientId: "c", scope: "s", load: never, homeScreenApp: true }).signIn(),
+    (error) => error.message === notLoadedMessage(true) && /Safari/.test(error.message),
+  );
+  await assert.rejects(
+    createAuth({ clientId: "c", scope: "s", load: never, homeScreenApp: false }).signIn(),
+    /Töltsd újra az oldalt/,
+  );
+});
+
+test("without a page there is nothing to load", async () => {
+  assert.equal(await loadGis(undefined), false);
 });

@@ -5,6 +5,38 @@
 import { DriveError } from "./drive.js";
 
 const SAFETY_MS = 60_000; // treat the token as expired a minute early
+const GIS_URL = "https://accounts.google.com/gsi/client";
+const GIS_WAIT_MS = 10_000;
+
+/** Google's sign-in script, loaded once more (index.html loads it too, but an iPhone
+ * home-screen app may open without it – e.g. when it was started offline). */
+export function loadGis(doc = globalThis.document, waitMs = GIS_WAIT_MS) {
+  return new Promise((resolve) => {
+    if (globalThis.google?.accounts?.oauth2) return resolve(true);
+    if (!doc) return resolve(false);
+    const script = doc.createElement("script");
+    const timer = setTimeout(() => resolve(false), waitMs);
+    script.src = GIS_URL;
+    script.async = true;
+    script.onload = () => {
+      clearTimeout(timer);
+      resolve(Boolean(globalThis.google?.accounts?.oauth2));
+    };
+    script.onerror = () => {
+      clearTimeout(timer);
+      resolve(false);
+    };
+    doc.head.append(script);
+  });
+}
+
+/** The message when the script cannot be had. An iPhone home-screen app gets a way out. */
+export function notLoadedMessage(homeScreenApp) {
+  return homeScreenApp
+    ? "A Google-belépés nem töltődött be. Van internet? Ha igen, nyisd meg a fotózót Safariban " +
+        "(locitanit.github.io/rmg-faliujsag-foto) – ott magától belép."
+    : "A Google-belépés nem töltődött be. Van internet? Töltsd újra az oldalt.";
+}
 
 /**
  * hostedDomain: the school's Google domain – the account chooser then only offers accounts
@@ -13,7 +45,14 @@ const SAFETY_MS = 60_000; // treat the token as expired a minute early
  *   it Google skips the chooser and takes exactly that account – a phone with a private
  *   and a school account no longer signs in with the wrong one.
  */
-export function createAuth({ clientId, scope, hostedDomain = "", getHint = () => "" }) {
+export function createAuth({
+  clientId,
+  scope,
+  hostedDomain = "",
+  getHint = () => "",
+  load = loadGis,
+  homeScreenApp = Boolean(globalThis.navigator?.standalone),
+}) {
   let token = "";
   let expiresAt = 0;
 
@@ -38,13 +77,12 @@ export function createAuth({ clientId, scope, hostedDomain = "", getHint = () =>
     },
 
     /** Must be called from a tap. Resolves when signed in; rejects with a Hungarian message. */
-    signIn() {
+    async signIn() {
+      if (!globalThis.google?.accounts?.oauth2 && !(await load())) {
+        throw new Error(notLoadedMessage(homeScreenApp));
+      }
       return new Promise((resolve, reject) => {
-        const gis = globalThis.google?.accounts?.oauth2;
-        if (!gis) {
-          reject(new Error("A Google-belépés nem töltődött be. Van internet? Töltsd újra az oldalt."));
-          return;
-        }
+        const gis = globalThis.google.accounts.oauth2;
         const hint = getHint();
         const client = gis.initTokenClient({
           client_id: clientId,
