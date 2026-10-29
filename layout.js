@@ -17,14 +17,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            21,
             22,
-            23
+            23,
+            24
           ],
           [
-            24,
             25,
-            26
+            26,
+            27
           ]
         ]
       },
@@ -34,14 +34,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            24,
             25,
-            26
+            26,
+            27
           ],
           [
-            27,
             28,
-            29
+            29,
+            30
           ]
         ]
       },
@@ -51,14 +51,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            27,
             28,
-            29
+            29,
+            30
           ],
           [
-            30,
             31,
-            32
+            32,
+            33
           ]
         ]
       },
@@ -68,14 +68,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            30,
             31,
-            32
+            32,
+            33
           ],
           [
-            33,
             34,
-            35
+            36,
+            37
           ]
         ]
       },
@@ -85,14 +85,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            33,
             34,
-            35
+            36,
+            37
           ],
           [
-            36,
-            37,
-            38
+            38,
+            39,
+            40
           ]
         ]
       },
@@ -102,14 +102,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            36,
-            37,
-            38
+            38,
+            39,
+            40
           ],
           [
-            39,
-            40,
-            41
+            41,
+            42,
+            43
           ]
         ]
       }
@@ -126,8 +126,8 @@ export const GROUPS = [
         "columns": [
           [
             0,
-            2,
-            1
+            1,
+            2
           ],
           [
             3,
@@ -183,7 +183,7 @@ export const GROUPS = [
           [
             12,
             13,
-            14
+            15
           ]
         ]
       },
@@ -195,12 +195,12 @@ export const GROUPS = [
           [
             12,
             13,
-            14
+            15
           ],
           [
-            15,
             16,
-            17
+            17,
+            18
           ]
         ]
       },
@@ -210,14 +210,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            15,
             16,
-            17
+            17,
+            18
           ],
           [
-            18,
             19,
-            20
+            20,
+            21
           ]
         ]
       }
@@ -233,14 +233,14 @@ export const GROUPS = [
         "canBeEmpty": true,
         "columns": [
           [
-            42,
-            43,
-            44
+            44,
+            45,
+            46
           ],
           [
-            45,
-            46,
-            47
+            47,
+            48,
+            49
           ]
         ]
       }
@@ -254,64 +254,64 @@ export const GROUPS = [
         "id": "parafa-1-felso-1",
         "label": "felső sor, 1. rész",
         "stickers": [
-          48,
-          49
+          50,
+          51
         ]
       },
       {
         "id": "parafa-1-felso-2",
         "label": "felső sor, 2. rész",
         "stickers": [
-          49,
-          50
+          51,
+          52
         ]
       },
       {
         "id": "parafa-1-felso-3",
         "label": "felső sor, 3. rész",
         "stickers": [
-          50,
-          51
+          52,
+          53
         ]
       },
       {
         "id": "parafa-1-felso-4",
         "label": "felső sor, 4. rész",
         "stickers": [
-          51,
-          52
+          53,
+          54
         ]
       },
       {
         "id": "parafa-1-also-1",
         "label": "alsó sor, 1. rész",
         "stickers": [
-          53,
-          54
+          55,
+          57
         ]
       },
       {
         "id": "parafa-1-also-2",
         "label": "alsó sor, 2. rész",
         "stickers": [
-          54,
-          55
+          57,
+          58
         ]
       },
       {
         "id": "parafa-1-also-3",
         "label": "alsó sor, 3. rész",
         "stickers": [
-          55,
-          56
+          58,
+          59
         ]
       },
       {
         "id": "parafa-1-also-4",
         "label": "alsó sor, 4. rész",
         "stickers": [
-          56,
-          57
+          59,
+          60
         ]
       }
     ]
@@ -324,48 +324,48 @@ export const GROUPS = [
         "id": "parafa-2-felso-1",
         "label": "felső sor, 1. rész",
         "stickers": [
-          60,
-          61
+          63,
+          64
         ]
       },
       {
         "id": "parafa-2-felso-2",
         "label": "felső sor, 2. rész",
         "stickers": [
-          61,
-          62
+          64,
+          65
         ]
       },
       {
         "id": "parafa-2-felso-3",
         "label": "felső sor, 3. rész",
         "stickers": [
-          62,
-          63
+          65,
+          66
         ]
       },
       {
         "id": "parafa-2-also-1",
         "label": "alsó sor, 1. rész",
         "stickers": [
-          64,
-          65
+          67,
+          68
         ]
       },
       {
         "id": "parafa-2-also-2",
         "label": "alsó sor, 2. rész",
         "stickers": [
-          65,
-          66
+          68,
+          69
         ]
       },
       {
         "id": "parafa-2-also-3",
         "label": "alsó sor, 3. rész",
         "stickers": [
-          66,
-          67
+          69,
+          70
         ]
       }
     ]
