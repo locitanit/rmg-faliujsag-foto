@@ -14,12 +14,14 @@ test("the wall is listed left to right: two cabinet rows, the side wall, the boa
     ["Bal szekrénysor", 6],
     ["Jobb szekrénysor", 6],
     ["Oldalfal", 1],
-    ["Nagy parafatábla", 8],
-    ["Kis parafatábla", 6],
+    ["Nagy parafatábla", 9],
+    ["Kis parafatábla", 7],
   ]);
-  assert.equal(allItems(GROUPS).length, 27);
-  // A board piece = two neighbouring stickers of the top or the bottom edge.
-  const small = GROUPS[4].items;
+  assert.equal(allItems(GROUPS).length, 29);
+  // A board piece = two neighbouring stickers of the top or the bottom edge; the board's
+  // last item is its far photo.
+  assert.deepEqual(GROUPS.slice(3).map((g) => g.items.at(-1).id), ["parafa-1-egesz", "parafa-2-egesz"]);
+  const small = GROUPS[4].items.filter((i) => !i.whole);
   assert.deepEqual(small.map((i) => i.stickers), [
     [63, 64], [64, 65], [65, 66], [67, 68], [68, 69], [69, 70],
   ]);
@@ -120,6 +122,48 @@ test("a door photographed in two halves: each photo says which half it shows", (
 test("a piece of a cork board is always whole", () => {
   const { coveredParts } = checkModule;
   assert.deepEqual(coveredParts([55, 57], GROUPS), [{ id: "parafa-1-also-1", top: true, bottom: true }]);
+});
+
+test("a far photo of a whole board: most of its stickers, not all on one line", () => {
+  // Big board: 12 stickers – 8 are needed, and 4 of them off one line.
+  assert.ok(coveredItems([50, 51, 52, 53, 54, 55, 57, 58], GROUPS).includes("parafa-1-egesz"));
+  assert.ok(!coveredItems([50, 51, 52, 53, 54, 55, 57], GROUPS).includes("parafa-1-egesz"));
+  // Small board: 10 stickers – 6 are needed.
+  assert.ok(coveredItems([63, 64, 65, 66, 67, 70], GROUPS).includes("parafa-2-egesz"));
+  // Only the top edge and one side sticker: 3 of every 4 on one line.
+  assert.ok(!checkModule.generalFour([[0, 0], [500, 0], [1000, 0], [1500, 0], [0, 50]]));
+  assert.ok(checkModule.generalFour([[0, 0], [1000, 0], [0, 900], [1000, 900]]));
+});
+
+test("a far photo of a board is no 'too far': it ticks the board, not its close pieces", () => {
+  const ids = [50, 51, 52, 53, 54, 55, 57, 58, 59, 60, 61, 62];
+  const side = 35 * 1.2; // ~3 m away
+  const far = judge({ markers: ids.map((id) => marker(id, side)), sharpness: 0.4, groups: GROUPS });
+  assert.deepEqual(far.items, ["parafa-1-egesz"]);
+  assert.deepEqual(far.marks, ["parafa-1-egesz:top", "parafa-1-egesz:bottom"]);
+  assert.deepEqual(far.labels, ["Nagy parafatábla – egész tábla (távoli)"]);
+  assert.deepEqual(far.warnings, []);
+
+  // Close enough to read: the pieces count too.
+  const near = judged(ids);
+  assert.ok(near.items.includes("parafa-1-felso-1") && near.items.includes("parafa-1-egesz"));
+
+  // A far photo of a door is still too far.
+  const door = judge({ markers: [0, 1, 2, 3, 4, 5].map((id) => marker(id, side)), sharpness: 0.4, groups: GROUPS });
+  assert.deepEqual(door.warnings.map((w) => w.code), ["too-far"]);
+});
+
+test("Befejezés reminds of a board with close photos but no far photo", () => {
+  const { missingFarPhotos } = checkModule;
+  assert.deepEqual(missingFarPhotos([], GROUPS), []);
+  assert.deepEqual(missingFarPhotos(["sor-1-ajto-1:top"], GROUPS), []);
+  assert.deepEqual(missingFarPhotos(["parafa-1-felso-1:top", "parafa-2-also-2:top"], GROUPS), [
+    "Nagy parafatábla", "Kis parafatábla",
+  ]);
+  assert.deepEqual(
+    missingFarPhotos(["parafa-1-felso-1:top", "parafa-1-egesz:top", "parafa-1-egesz:bottom"], GROUPS),
+    [],
+  );
 });
 
 test("the verdict carries a mark per half, and names the half in its label", () => {

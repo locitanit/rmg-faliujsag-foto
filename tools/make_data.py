@@ -102,6 +102,9 @@ def write_layout(layout) -> None:
         "// of a column are listed top to bottom. A piece of a cork board (`stickers`) is the\n"
         "// strip between two neighbouring stickers of its top or bottom edge: a photo that\n"
         "// holds both of them ticks it (the processor needs any 2 stickers of the board).\n"
+        "// For the wall map: `size` of a group and `box` of an item in mm (from the group's\n"
+        "// top left corner), `line` = the map line. A board's last item (`whole`) is its far\n"
+        "// photo: `points` = [id, x_mm, y_mm] of every sticker of the board.\n"
         f"export const MARKER_MM = {layout.marker_mm:g};\n"
         f"export const GROUPS = {json.dumps(groups, ensure_ascii=False, indent=2)};\n"
     )
@@ -133,6 +136,14 @@ def board_items(zone, board) -> list[dict]:
                     "h": half,
                 }),
             })
+    # One far photo of the whole board, straight on: the processor lines the close photos up
+    # on it (board_worker/doors.py `align`). Every sticker with its place, for the check.
+    items.append({
+        "id": f"{board.id}-egesz",
+        "label": "egész tábla (távoli)",
+        "whole": True,
+        "points": [[m, round(markers[m][0]), round(markers[m][1])] for m in board.stickers],
+    })
     return items
 
 

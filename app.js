@@ -1,7 +1,7 @@
 // The screen: sign in, take photos, "Befejezés". All the logic lives in rounds.js / drive.js.
 
 import { createAuth } from "./auth.js";
-import { BOTTOM, TOP, allItems, markOf } from "./check.js";
+import { BOTTOM, TOP, allItems, markOf, missingFarPhotos } from "./check.js";
 import { CONFIG } from "./config.js";
 import { createDrive } from "./drive.js";
 import { GROUPS } from "./layout.js";
@@ -65,6 +65,7 @@ let pending = null; // a photo with warnings, waiting for "Újra fotózom" / "Í
 const ITEM_COUNT = allItems(GROUPS).length;
 
 let fresh = new Set(); // the pieces the last photo showed: outlined on the map
+let remindedFor = null; // the missing far photos "Befejezés" already reminded of
 
 function stateText(top, bottom, isEmpty) {
   if (isEmpty) return "üresnek jelölve";
@@ -98,10 +99,21 @@ function renderWall(marks, emptyDoors) {
       const plan = document.createElement("div");
       plan.className = "map-plan";
       plan.style.aspectRatio = `${group.size.w} / ${group.size.h}`;
+      const below = []; // a board's far photo: a strip under the board, not a place on it
       group.items.forEach((item) => {
         const top = have.has(markOf(item.id, TOP));
         const bottom = have.has(markOf(item.id, BOTTOM));
         const isEmpty = empty.has(item.id);
+        if (item.whole) {
+          const strip = document.createElement("span");
+          strip.className = `piece far${top ? " have" : ""}${fresh.has(item.id) ? " fresh" : ""}`;
+          strip.textContent = top ? "távoli fotó ✓" : "+ 1 távoli fotó az egészről";
+          strip.title = `${group.name} – ${item.label}: ${top ? "megvan" : "nincs meg"}`;
+          strip.setAttribute("aria-label", strip.title);
+          if (top) whole += 1;
+          below.push(strip);
+          return;
+        }
         // A cabinet door is a button: a tap says "nothing hangs on it" (and a tap takes it back).
         const piece = document.createElement(item.canBeEmpty ? "button" : "span");
         const look = isEmpty ? " empty" : top && bottom ? " have" : top ? " top" : bottom ? " bottom" : "";
@@ -127,7 +139,7 @@ function renderWall(marks, emptyDoors) {
       const name = document.createElement("div");
       name.className = "group-name";
       name.textContent = group.name;
-      box.append(plan, name);
+      box.append(plan, ...below, name);
       row.append(box);
     }
     // A shorter line keeps the scale of the widest one: the rest of it is left empty.
@@ -294,6 +306,19 @@ $("finish").addEventListener(
   "click",
   guard(async () => {
     closeReview(); // a photo still waiting for "Így is jó" is not sent
+    // A gentle reminder, once per batch state: the second press sends anyway.
+    const missing = missingFarPhotos((await rounds.status()).marks, GROUPS);
+    const key = missing.join("|");
+    if (missing.length && remindedFor !== key) {
+      remindedFor = key;
+      say(
+        `Ehhez még nincs távoli fotó: ${missing.join(", ")}. Állj kb. 3 méterre, és fotózd le ` +
+          "az egész táblát szemből – így a közeli fotók pontosabban illeszkednek. " +
+          "Ha így is küldöd, nyomd meg még egyszer a Befejezést.",
+      );
+      return;
+    }
+    remindedFor = null;
     await rounds.finish();
     fresh = new Set();
     $("last").textContent = "";

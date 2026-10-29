@@ -361,6 +361,24 @@ button.piece {
       var(--muted) calc(50% + 1px), transparent calc(50% + 1px));
 }
 
+/* A board's far photo: a strip under the board. */
+.piece.far {
+  position: static;
+  width: 100%;
+  margin-top: 3px;
+  padding: 1px 4px;
+  border-style: dashed;
+  font-size: 10px;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.piece.far.have {
+  border-style: solid;
+}
+
 /* What the last photo showed. */
 .piece.fresh {
   outline: 2px solid var(--text);

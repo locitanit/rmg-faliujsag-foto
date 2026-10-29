@@ -14,14 +14,15 @@ test("every piece of the map lies inside its group, and the pieces do not overla
   for (const group of GROUPS) {
     const { w, h } = group.size;
     assert.ok(w > 0 && h > 0, group.id);
-    for (const item of group.items) {
+    const drawn = group.items.filter((item) => !item.whole); // the far photo has no box
+    for (const item of drawn) {
       const box = item.box;
       assert.ok(box.w > 0 && box.h > 0, item.id);
       assert.ok(box.x >= 0 && box.y >= 0, item.id);
       assert.ok(box.x + box.w <= w && box.y + box.h <= h, item.id);
     }
-    for (const a of group.items) {
-      for (const b of group.items) {
+    for (const a of drawn) {
+      for (const b of drawn) {
         if (a === b) continue;
         const apart =
           a.box.x + a.box.w <= b.box.x || b.box.x + b.box.w <= a.box.x ||

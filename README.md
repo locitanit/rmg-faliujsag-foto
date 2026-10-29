@@ -48,9 +48,16 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
   - szól, ha **nincs elég matrica**, ha **túl messziről** készült (3,5 px/mm alatt), vagy ha
     **életlen**. Ilyenkor választani lehet: „Újra fotózom" (a kép eldobva) vagy „Így is jó".
   Ez csak tanács: ha az ellenőrzés nem sikerül, a fotó akkor is megmarad.
-- **A fal térképe:** a fal 27 része nagyjából méretarányosan, három sorban, ugyanakkora
+- **Távoli fotó táblánként:** a térképen minden tábla alatt egy sáv: „+ 1 távoli fotó az
+  egészről". Akkor zöld, ha egy fotón a tábla matricáinak legalább 60%-a látszik, és köztük
+  4, amelyekből semelyik 3 nincs egy egyenesen (100 mm-en belül) – a feldolgozó
+  `doors._general_four` szabálya. Ehhez illeszti a feldolgozó a közeli fotókat (a varratok így
+  30–120 mm helyett 1–12 mm-re javultak). Ilyen fotóra nincs „túl messziről" figyelmeztetés,
+  de a tábla közeli darabjait sem pipálja (az apró betű rajta nem olvasható). Ha a körben van
+  közeli fotó egy tábláról, de távoli nincs, a Befejezés egyszer szól; a második nyomás így is küld.
+- **A fal térképe:** a fal 29 része nagyjából méretarányosan, három sorban, ugyanakkora
   léptékben: 1. a bal szekrénysor (6 ajtó), 2. a jobb szekrénysor (6 ajtó), 3. az oldalfal, a
-  nagy tábla 8 darabja (felső sor 1–4, alsó sor 1–4) és a kis tábla 6 darabja. A méretek a `zones.json`-ból jönnek
+  nagy tábla 8 darabja (felső sor 1–4, alsó sor 1–4) és a kis tábla 6 darabja, mindkét tábla alatt a távoli fotó sávja. A méretek a `zones.json`-ból jönnek
   (`layout.js`: `size`, `box` mm-ben). A legutóbbi fotón felismert rész keretet kap. A térkép
   **csak az aktuális kört** mutatja: Befejezés után kiürül.
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó

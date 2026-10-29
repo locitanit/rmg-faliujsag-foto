@@ -5,6 +5,9 @@
 // of a column are listed top to bottom. A piece of a cork board (`stickers`) is the
 // strip between two neighbouring stickers of its top or bottom edge: a photo that
 // holds both of them ticks it (the processor needs any 2 stickers of the board).
+// For the wall map: `size` of a group and `box` of an item in mm (from the group's
+// top left corner), `line` = the map line. A board's last item (`whole`) is its far
+// photo: `points` = [id, x_mm, y_mm] of every sticker of the board.
 export const MARKER_MM = 35;
 export const GROUPS = [
   {
@@ -459,6 +462,73 @@ export const GROUPS = [
           "w": 508,
           "h": 470
         }
+      },
+      {
+        "id": "parafa-1-egesz",
+        "label": "egész tábla (távoli)",
+        "whole": true,
+        "points": [
+          [
+            50,
+            24,
+            24
+          ],
+          [
+            51,
+            542,
+            24
+          ],
+          [
+            52,
+            1042,
+            24
+          ],
+          [
+            53,
+            1542,
+            24
+          ],
+          [
+            54,
+            2029,
+            24
+          ],
+          [
+            55,
+            24,
+            915
+          ],
+          [
+            57,
+            540,
+            915
+          ],
+          [
+            58,
+            1040,
+            915
+          ],
+          [
+            59,
+            1542,
+            915
+          ],
+          [
+            60,
+            2027,
+            915
+          ],
+          [
+            61,
+            24,
+            472
+          ],
+          [
+            62,
+            2028,
+            472
+          ]
+        ]
       }
     ]
   },
@@ -554,6 +624,63 @@ export const GROUPS = [
           "w": 495,
           "h": 470
         }
+      },
+      {
+        "id": "parafa-2-egesz",
+        "label": "egész tábla (távoli)",
+        "whole": true,
+        "points": [
+          [
+            63,
+            25,
+            25
+          ],
+          [
+            64,
+            484,
+            25
+          ],
+          [
+            65,
+            939,
+            25
+          ],
+          [
+            66,
+            1369,
+            25
+          ],
+          [
+            67,
+            25,
+            905
+          ],
+          [
+            68,
+            480,
+            905
+          ],
+          [
+            69,
+            945,
+            905
+          ],
+          [
+            70,
+            1419,
+            905
+          ],
+          [
+            71,
+            25,
+            470
+          ],
+          [
+            72,
+            1420,
+            470
+          ]
+        ]
       }
     ]
   }
