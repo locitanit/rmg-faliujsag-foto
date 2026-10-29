@@ -23,12 +23,6 @@ export class MemoryStore {
   async deletePhoto(id) {
     this.photos.delete(id);
   }
-  async getMeta() {
-    return this.meta ? structuredClone(this.meta) : null;
-  }
-  async putMeta(meta) {
-    this.meta = structuredClone(meta);
-  }
 }
 
 export function response(status, body = {}, headers = {}) {
@@ -59,10 +53,11 @@ export class FakeDrive {
   constructor() {
     this.folders = [];
     this.files = [];
-    this.failures = []; // errors thrown by the next calls, in order
+    this.failures = []; // errors thrown by the next calls, in order (null = that call works)
   }
   _maybeFail() {
-    if (this.failures.length) throw this.failures.shift();
+    const failure = this.failures.shift();
+    if (failure) throw failure;
   }
   async createFolder(name, parentId) {
     this._maybeFail();

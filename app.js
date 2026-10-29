@@ -1,4 +1,4 @@
-// The screen: sign in, take photos, "Kész". All the logic lives in rounds.js / drive.js.
+// The screen: sign in, take photos, "Befejezés". All the logic lives in rounds.js / drive.js.
 
 import { createAuth } from "./auth.js";
 import { BOTTOM, TOP, allItems, markOf } from "./check.js";
@@ -11,9 +11,10 @@ import { Rounds } from "./rounds.js";
 import { BrowserStore } from "./store.js";
 
 const RETRY_EVERY_MS = 30_000;
-// A round closes by itself this long after the last photo / tap: there is no "Kész" button.
-const IDLE_CLOSE_MS = 30_000;
-const IDLE_CHECK_MS = 5_000;
+// A batch is sent with "Befejezés"; a forgotten one goes by itself this long after the last
+// photo / tap (and when the app is opened again later).
+const IDLE_CLOSE_MS = 15 * 60_000;
+const IDLE_CHECK_MS = 30_000;
 const $ = (id) => document.getElementById(id);
 const configured = Boolean(CONFIG.clientId && CONFIG.inboxFolderId);
 
@@ -63,53 +64,84 @@ const rounds = new Rounds({
 let pending = null; // a photo with warnings, waiting for "Újra fotózom" / "Így is jó"
 const ITEM_COUNT = allItems(GROUPS).length;
 
-/** The check-list: every door and board part, ticked when a photo of this round shows it. */
+let fresh = new Set(); // the pieces the last photo showed: outlined on the map
+
+function stateText(top, bottom, isEmpty) {
+  if (isEmpty) return "üresnek jelölve";
+  return top && bottom ? "megvan" : top ? "csak a teteje van meg" : bottom ? "csak az alja van meg" : "nincs meg";
+}
+
+/**
+ * The wall map of this batch: every door and board piece drawn roughly to scale (layout.js
+ * boxes, in mm), filled where a photo of the batch shows it, crossed where it was tapped
+ * empty. Cabinets on the first line, boards on the second, both at the same scale.
+ */
 function renderWall(marks, emptyDoors) {
   const have = new Set(marks);
   const empty = new Set(emptyDoors);
+  const lines = [...new Set(GROUPS.map((group) => group.line))].sort();
+  const widths = lines.map((line) =>
+    GROUPS.filter((group) => group.line === line).reduce((sum, group) => sum + group.size.w, 0),
+  );
+  const widest = Math.max(...widths);
   const wall = $("wall");
   wall.replaceChildren();
   let whole = 0;
   let half = 0;
-  for (const group of GROUPS) {
-    const box = document.createElement("div");
-    const name = document.createElement("div");
-    name.className = "group-name";
-    name.textContent = group.name;
-    const chips = document.createElement("div");
-    chips.className = "chips";
-    group.items.forEach((item, index) => {
-      const top = have.has(markOf(item.id, TOP));
-      const bottom = have.has(markOf(item.id, BOTTOM));
-      const isEmpty = empty.has(item.id);
-      // A cabinet door is a button: a tap says "nothing hangs on it" (and a tap takes it back).
-      const chip = document.createElement(item.canBeEmpty ? "button" : "span");
-      // A door photographed in two halves: the chip is green where the door is done.
-      const look = isEmpty ? " empty" : top && bottom ? " have" : top ? " top" : bottom ? " bottom" : "";
-      chip.className = `chip${look}`;
-      const number = String(index + 1);
-      // Only the number, in every state: the look says the rest, and the chip never grows.
-      chip.textContent = number;
-      const state = isEmpty
-        ? "üresnek jelölve"
-        : top && bottom ? "megvan" : top ? "csak a teteje van meg" : bottom ? "csak az alja van meg" : "nincs meg";
-      chip.title = `${group.name} – ${item.label}: ${state}`;
-      chip.setAttribute("aria-label", chip.title);
-      if (item.canBeEmpty) {
-        chip.type = "button";
-        chip.setAttribute("aria-pressed", String(isEmpty));
-        chip.addEventListener("click", guard(() => toggleEmpty(item, top || bottom, isEmpty)));
-      }
-      if (isEmpty || (top && bottom)) whole += 1;
-      else if (top || bottom) half += 1;
-      chips.append(chip);
-    });
-    box.append(name, chips);
-    wall.append(box);
-  }
+  lines.forEach((line, lineIndex) => {
+    const row = document.createElement("div");
+    row.className = "map-line";
+    for (const group of GROUPS.filter((each) => each.line === line)) {
+      const box = document.createElement("div");
+      box.className = "map-group";
+      box.style.flexGrow = String(group.size.w);
+      const plan = document.createElement("div");
+      plan.className = "map-plan";
+      plan.style.aspectRatio = `${group.size.w} / ${group.size.h}`;
+      group.items.forEach((item) => {
+        const top = have.has(markOf(item.id, TOP));
+        const bottom = have.has(markOf(item.id, BOTTOM));
+        const isEmpty = empty.has(item.id);
+        // A cabinet door is a button: a tap says "nothing hangs on it" (and a tap takes it back).
+        const piece = document.createElement(item.canBeEmpty ? "button" : "span");
+        const look = isEmpty ? " empty" : top && bottom ? " have" : top ? " top" : bottom ? " bottom" : "";
+        piece.className = `piece${look}${fresh.has(item.id) ? " fresh" : ""}`;
+        const { x, y, w, h } = item.box;
+        piece.style.left = `${(100 * x) / group.size.w}%`;
+        piece.style.top = `${(100 * y) / group.size.h}%`;
+        piece.style.width = `${(100 * w) / group.size.w}%`;
+        piece.style.height = `${(100 * h) / group.size.h}%`;
+        // Doors get their number; the side wall and board pieces are known by their place.
+        if (/ajtó$/.test(item.label)) piece.textContent = item.label.split(".")[0];
+        piece.title = `${group.name} – ${item.label}: ${stateText(top, bottom, isEmpty)}`;
+        piece.setAttribute("aria-label", piece.title);
+        if (item.canBeEmpty) {
+          piece.type = "button";
+          piece.setAttribute("aria-pressed", String(isEmpty));
+          piece.addEventListener("click", guard(() => toggleEmpty(item, top || bottom, isEmpty)));
+        }
+        if (isEmpty || (top && bottom)) whole += 1;
+        else if (top || bottom) half += 1;
+        plan.append(piece);
+      });
+      const name = document.createElement("div");
+      name.className = "group-name";
+      name.textContent = group.name;
+      box.append(plan, name);
+      row.append(box);
+    }
+    // A shorter line keeps the scale of the widest one: the rest of it is left empty.
+    const rest = widest - widths[lineIndex];
+    if (rest > 0) {
+      const spacer = document.createElement("div");
+      spacer.style.flexGrow = String(rest);
+      row.append(spacer);
+    }
+    wall.append(row);
+  });
   const halves = half ? ` (+ ${half} félig)` : "";
   const all = whole === ITEM_COUNT ? " – minden megvan ✓" : "";
-  $("wall-title").textContent = `Ma megvan: ${whole} / ${ITEM_COUNT}${halves}${all}`;
+  $("wall-title").textContent = `Ebben a körben: ${whole} / ${ITEM_COUNT}${halves}${all}`;
 }
 
 async function toggleEmpty(item, photographed, isEmpty) {
@@ -118,7 +150,7 @@ async function toggleEmpty(item, photographed, isEmpty) {
     return;
   }
   await rounds.setEmpty(item.id, !isEmpty);
-  say(isEmpty ? "" : "Rendben, üresnek jelöltem – magától elküldöm.");
+  say(isEmpty ? "" : "Rendben, üresnek jelöltem – a Befejezéssel megy el.");
   await render();
 }
 
@@ -140,14 +172,15 @@ function closeReview() {
 
 async function keep(file, verdict) {
   await rounds.addPhoto(file, verdict?.marks ?? []);
+  fresh = new Set(verdict?.items ?? []);
   if (!verdict) {
-    $("last").textContent = "Ezt a fotót nem tudtam ellenőrizni, de elmentettem.";
+    $("last").textContent = "Ezt a fotót nem tudtam ellenőrizni, de eltettem.";
   } else if (verdict.labels.length) {
-    $("last").textContent = `✓ ${verdict.labels.join(", ")}`;
+    $("last").textContent = `✓ Felismertem: ${verdict.labels.join(", ")}`;
   } else {
-    $("last").textContent = "";
+    $("last").textContent = "Eltettem.";
   }
-  await sync();
+  await render();
 }
 
 /** A fresh photo: look at it first; with a warning the photographer decides. */
@@ -191,6 +224,10 @@ async function render() {
     if ($("install-dialog").open) $("install-dialog").close();
   }
   renderWall(status.marks, status.empty);
+  $("finish").disabled = status.taken + status.empty.length === 0;
+  $("finish").textContent = status.taken
+    ? `Befejezés – ${status.taken} fotó elküldése`
+    : status.empty.length ? "Befejezés – elküldés" : "Befejezés";
   $("counts").textContent = status.waiting
     ? `${status.waiting} fotó vár feltöltésre a telefonon`
     : "";
@@ -211,7 +248,7 @@ async function sync() {
   } else if (result.state !== "idle") {
     say(result.message, result.state === "blocked" ? "bad" : "");
   } else if (!after.closing) {
-    say("Minden felment. Kb. 10 perc múlva látszik a faliújságon.", "ok");
+    say("Elküldve. Kb. 10–15 perc múlva látszik az RMG Toolsban.", "ok");
   }
 }
 
@@ -250,6 +287,17 @@ $("keep").addEventListener(
     const { file, verdict } = pending;
     closeReview();
     await keep(file, verdict);
+  }),
+);
+
+$("finish").addEventListener(
+  "click",
+  guard(async () => {
+    closeReview(); // a photo still waiting for "Így is jó" is not sent
+    await rounds.finish();
+    fresh = new Set();
+    $("last").textContent = "";
+    await sync();
   }),
 );
 

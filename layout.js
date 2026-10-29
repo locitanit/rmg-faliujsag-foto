@@ -10,6 +10,11 @@ export const GROUPS = [
   {
     "id": "sor-2",
     "name": "Bal szekrénysor",
+    "line": 1,
+    "size": {
+      "w": 2650,
+      "h": 923
+    },
     "items": [
       {
         "id": "sor-2-ajto-1",
@@ -26,7 +31,13 @@ export const GROUPS = [
             26,
             27
           ]
-        ]
+        ],
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 400,
+          "h": 923
+        }
       },
       {
         "id": "sor-2-ajto-2",
@@ -43,7 +54,13 @@ export const GROUPS = [
             29,
             30
           ]
-        ]
+        ],
+        "box": {
+          "x": 400,
+          "y": 0,
+          "w": 451,
+          "h": 923
+        }
       },
       {
         "id": "sor-2-ajto-3",
@@ -60,7 +77,13 @@ export const GROUPS = [
             32,
             33
           ]
-        ]
+        ],
+        "box": {
+          "x": 851,
+          "y": 0,
+          "w": 451,
+          "h": 923
+        }
       },
       {
         "id": "sor-2-ajto-4",
@@ -77,7 +100,13 @@ export const GROUPS = [
             36,
             37
           ]
-        ]
+        ],
+        "box": {
+          "x": 1302,
+          "y": 0,
+          "w": 449,
+          "h": 923
+        }
       },
       {
         "id": "sor-2-ajto-5",
@@ -94,7 +123,13 @@ export const GROUPS = [
             39,
             40
           ]
-        ]
+        ],
+        "box": {
+          "x": 1751,
+          "y": 0,
+          "w": 450,
+          "h": 923
+        }
       },
       {
         "id": "sor-2-ajto-6",
@@ -111,13 +146,24 @@ export const GROUPS = [
             42,
             43
           ]
-        ]
+        ],
+        "box": {
+          "x": 2201,
+          "y": 0,
+          "w": 449,
+          "h": 923
+        }
       }
     ]
   },
   {
     "id": "sor-1",
     "name": "Jobb szekrénysor",
+    "line": 1,
+    "size": {
+      "w": 2646,
+      "h": 923
+    },
     "items": [
       {
         "id": "sor-1-ajto-1",
@@ -134,7 +180,13 @@ export const GROUPS = [
             4,
             5
           ]
-        ]
+        ],
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 400,
+          "h": 923
+        }
       },
       {
         "id": "sor-1-ajto-2",
@@ -151,7 +203,13 @@ export const GROUPS = [
             7,
             8
           ]
-        ]
+        ],
+        "box": {
+          "x": 400,
+          "y": 0,
+          "w": 448,
+          "h": 923
+        }
       },
       {
         "id": "sor-1-ajto-3",
@@ -168,7 +226,13 @@ export const GROUPS = [
             10,
             11
           ]
-        ]
+        ],
+        "box": {
+          "x": 848,
+          "y": 0,
+          "w": 448,
+          "h": 923
+        }
       },
       {
         "id": "sor-1-ajto-4",
@@ -185,7 +249,13 @@ export const GROUPS = [
             13,
             15
           ]
-        ]
+        ],
+        "box": {
+          "x": 1296,
+          "y": 0,
+          "w": 450,
+          "h": 923
+        }
       },
       {
         "id": "sor-1-ajto-5",
@@ -202,7 +272,13 @@ export const GROUPS = [
             17,
             18
           ]
-        ]
+        ],
+        "box": {
+          "x": 1746,
+          "y": 0,
+          "w": 452,
+          "h": 923
+        }
       },
       {
         "id": "sor-1-ajto-6",
@@ -219,13 +295,24 @@ export const GROUPS = [
             20,
             21
           ]
-        ]
+        ],
+        "box": {
+          "x": 2198,
+          "y": 0,
+          "w": 448,
+          "h": 923
+        }
       }
     ]
   },
   {
     "id": "oldalfal",
     "name": "Oldalfal",
+    "line": 1,
+    "size": {
+      "w": 404,
+      "h": 909
+    },
     "items": [
       {
         "id": "oldalfal",
@@ -242,13 +329,24 @@ export const GROUPS = [
             48,
             49
           ]
-        ]
+        ],
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 404,
+          "h": 909
+        }
       }
     ]
   },
   {
     "id": "parafa-1",
     "name": "Nagy parafatábla",
+    "line": 2,
+    "size": {
+      "w": 2050,
+      "h": 940
+    },
     "items": [
       {
         "id": "parafa-1-felso-1",
@@ -256,7 +354,13 @@ export const GROUPS = [
         "stickers": [
           50,
           51
-        ]
+        ],
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 542,
+          "h": 470
+        }
       },
       {
         "id": "parafa-1-felso-2",
@@ -264,7 +368,13 @@ export const GROUPS = [
         "stickers": [
           51,
           52
-        ]
+        ],
+        "box": {
+          "x": 542,
+          "y": 0,
+          "w": 500,
+          "h": 470
+        }
       },
       {
         "id": "parafa-1-felso-3",
@@ -272,7 +382,13 @@ export const GROUPS = [
         "stickers": [
           52,
           53
-        ]
+        ],
+        "box": {
+          "x": 1042,
+          "y": 0,
+          "w": 500,
+          "h": 470
+        }
       },
       {
         "id": "parafa-1-felso-4",
@@ -280,7 +396,13 @@ export const GROUPS = [
         "stickers": [
           53,
           54
-        ]
+        ],
+        "box": {
+          "x": 1542,
+          "y": 0,
+          "w": 508,
+          "h": 470
+        }
       },
       {
         "id": "parafa-1-also-1",
@@ -288,7 +410,13 @@ export const GROUPS = [
         "stickers": [
           55,
           57
-        ]
+        ],
+        "box": {
+          "x": 0,
+          "y": 470,
+          "w": 540,
+          "h": 470
+        }
       },
       {
         "id": "parafa-1-also-2",
@@ -296,7 +424,13 @@ export const GROUPS = [
         "stickers": [
           57,
           58
-        ]
+        ],
+        "box": {
+          "x": 540,
+          "y": 470,
+          "w": 500,
+          "h": 470
+        }
       },
       {
         "id": "parafa-1-also-3",
@@ -304,7 +438,13 @@ export const GROUPS = [
         "stickers": [
           58,
           59
-        ]
+        ],
+        "box": {
+          "x": 1040,
+          "y": 470,
+          "w": 502,
+          "h": 470
+        }
       },
       {
         "id": "parafa-1-also-4",
@@ -312,13 +452,24 @@ export const GROUPS = [
         "stickers": [
           59,
           60
-        ]
+        ],
+        "box": {
+          "x": 1542,
+          "y": 470,
+          "w": 508,
+          "h": 470
+        }
       }
     ]
   },
   {
     "id": "parafa-2",
     "name": "Kis parafatábla",
+    "line": 2,
+    "size": {
+      "w": 1440,
+      "h": 940
+    },
     "items": [
       {
         "id": "parafa-2-felso-1",
@@ -326,7 +477,13 @@ export const GROUPS = [
         "stickers": [
           63,
           64
-        ]
+        ],
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 484,
+          "h": 470
+        }
       },
       {
         "id": "parafa-2-felso-2",
@@ -334,7 +491,13 @@ export const GROUPS = [
         "stickers": [
           64,
           65
-        ]
+        ],
+        "box": {
+          "x": 484,
+          "y": 0,
+          "w": 455,
+          "h": 470
+        }
       },
       {
         "id": "parafa-2-felso-3",
@@ -342,7 +505,13 @@ export const GROUPS = [
         "stickers": [
           65,
           66
-        ]
+        ],
+        "box": {
+          "x": 939,
+          "y": 0,
+          "w": 501,
+          "h": 470
+        }
       },
       {
         "id": "parafa-2-also-1",
@@ -350,7 +519,13 @@ export const GROUPS = [
         "stickers": [
           67,
           68
-        ]
+        ],
+        "box": {
+          "x": 0,
+          "y": 470,
+          "w": 480,
+          "h": 470
+        }
       },
       {
         "id": "parafa-2-also-2",
@@ -358,7 +533,13 @@ export const GROUPS = [
         "stickers": [
           68,
           69
-        ]
+        ],
+        "box": {
+          "x": 480,
+          "y": 470,
+          "w": 465,
+          "h": 470
+        }
       },
       {
         "id": "parafa-2-also-3",
@@ -366,7 +547,13 @@ export const GROUPS = [
         "stickers": [
           69,
           70
-        ]
+        ],
+        "box": {
+          "x": 945,
+          "y": 470,
+          "w": 495,
+          "h": 470
+        }
       }
     ]
   }

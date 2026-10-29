@@ -1,6 +1,6 @@
-// A round of photos: taken one after the other, uploaded into one folder of the inbox
-// (`faliujsag/bejovo/<round id>/`), closed with a `done.json` – the processor only reads
-// a round once that file is there.
+// A round of photos (one "batch" on the screen): taken one after the other and kept on the
+// phone; "Befejezés" closes it, and only then does it go up – into one folder of the inbox
+// (`faliujsag/bejovo/<round id>/`), closed with a `done.json` the processor waits for.
 //
 // A photo is first saved locally (the store), then uploaded and removed: without network
 // nothing is lost, and nothing stays on the phone afterwards.
@@ -55,21 +55,8 @@ export class Rounds {
       uploaded: 0,
       closing: false,
       empty: [],
+      marks: [],
     };
-  }
-
-  _today() {
-    const now = this.now();
-    return `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`;
-  }
-
-  /**
-   * The check-list of the day: what was photographed, what was reported empty. Rounds come
-   * and go behind it (they close by themselves); the ticks stay until the next day.
-   */
-  async _wall() {
-    const saved = await this.store.getMeta();
-    return saved?.day === this._today() ? saved : { day: this._today(), marks: [], empty: [] };
   }
 
   /** Save a freshly taken photo into the open round (starting one if there is none). */
@@ -86,10 +73,8 @@ export class Rounds {
     // A photo of a door is stronger than an earlier "empty" click on it.
     const shown = new Set(marks.map((mark) => mark.split(":")[0]));
     round.empty = (round.empty ?? []).filter((id) => !shown.has(id));
-    // The pieces of the wall this photo shows (check.js) – for the check-list only.
-    const wall = await this._wall();
-    wall.marks = [...new Set([...wall.marks, ...marks])].sort();
-    wall.empty = wall.empty.filter((id) => !shown.has(id));
+    // The pieces of the wall this photo shows (check.js) – for the wall map only.
+    round.marks = [...new Set([...(round.marks ?? []), ...marks])].sort();
     // The photo first: a round that counts a photo it does not have could never close.
     await this.store.putPhoto({
       id: `${round.id}/${two(round.taken)}`,
@@ -98,7 +83,6 @@ export class Rounds {
       blob,
     });
     await this.store.putRound(round);
-    await this.store.putMeta(wall);
   }
 
   /**
@@ -107,19 +91,11 @@ export class Rounds {
    */
   async setEmpty(itemId, on) {
     const round = (await this._open()) ?? this._fresh();
-    const wall = await this._wall();
     const empty = new Set(round.empty ?? []);
-    if (!on && !empty.has(itemId) && wall.empty.includes(itemId)) {
-      throw new Error("Ezt már elküldtem üresként. Ha mégsem üres, fotózd le az ajtót.");
-    }
     if (on) empty.add(itemId);
     else empty.delete(itemId);
     round.empty = [...empty].sort();
     round.touchedAt = this.now().toISOString();
-    wall.empty = on
-      ? [...new Set([...wall.empty, itemId])].sort()
-      : wall.empty.filter((id) => id !== itemId);
-    await this.store.putMeta(wall);
     if (round.taken === 0 && round.empty.length === 0) {
       await this.store.deleteRound(round.id); // nothing in it: as if it never started
       return;
@@ -128,8 +104,8 @@ export class Rounds {
   }
 
   /**
-   * Close the open round if nothing happened in it for `idleMs`: nobody has to press
-   * anything. Returns true if a round was closed (done.json follows on the next pump).
+   * Close the open round if nothing happened in it for `idleMs` – the safety net for a
+   * forgotten "Befejezés". Returns true if a round was closed (it goes up on the next pump).
    */
   async finishIdle(idleMs) {
     const round = await this._open();
@@ -140,7 +116,7 @@ export class Rounds {
     return true;
   }
 
-  /** No more photos in this round; done.json follows the last upload. */
+  /** "Befejezés": no more photos in this round; it goes up, done.json after the last photo. */
   async finish() {
     const round = await this._open();
     if (!round) return;
@@ -152,21 +128,23 @@ export class Rounds {
     await this.store.putRound(round);
   }
 
-  /** What the screen shows: the open round (or the one still closing), and the whole queue. */
+  /**
+   * What the screen shows: the open round (the batch being photographed – its marks and
+   * empty doors only, so the map starts clean after every "Befejezés"), and the queue.
+   */
   async status() {
     const rounds = await this.store.getRounds();
-    const waiting = (await this.store.getPhotos()).length;
+    const photos = await this.store.getPhotos();
     const open = rounds.find((round) => !round.closing);
-    const shown = open ?? rounds[rounds.length - 1];
-    const wall = await this._wall();
+    const sending = rounds.filter((round) => round.closing).map((round) => round.id);
     return {
       open: Boolean(open),
-      closing: rounds.some((round) => round.closing),
-      taken: shown?.taken ?? 0,
-      uploaded: shown?.uploaded ?? 0,
-      marks: wall.marks, // of the whole day, not of one round
-      empty: wall.empty,
-      waiting,
+      closing: sending.length > 0,
+      taken: open?.taken ?? 0,
+      marks: open?.marks ?? [],
+      empty: open?.empty ?? [],
+      // Photos of finished batches still on the phone (no network, signed out…).
+      waiting: photos.filter((photo) => sending.includes(photo.roundId)).length,
     };
   }
 
@@ -185,7 +163,8 @@ export class Rounds {
     try {
       const rounds = await this.store.getRounds();
       rounds.sort((a, b) => a.startedAt.localeCompare(b.startedAt));
-      for (const round of rounds) {
+      // Only finished batches go up: the open one stays on the phone until "Befejezés".
+      for (const round of rounds.filter((each) => each.closing)) {
         await this._uploadRound(round);
       }
       return { state: "idle", message: "" };
@@ -200,8 +179,8 @@ export class Rounds {
     const photos = (await this.store.getPhotos())
       .filter((photo) => photo.roundId === round.id)
       .sort((a, b) => a.id.localeCompare(b.id));
-    const emptyOnly = round.closing && Boolean(round.empty?.length);
-    if ((photos.length || emptyOnly) && !round.folderId) {
+    if (!round.folderId) {
+      // A closing round always has a photo or an empty door (finish drops a bare one).
       round.folderId = await this.drive.createFolder(round.id, this.inboxFolderId);
       await this.store.putRound(round);
     }
@@ -211,18 +190,15 @@ export class Rounds {
       round.uploaded += 1;
       await this.store.putRound(round);
     }
-    if (!round.closing) return;
-    if (round.folderId) {
-      // Counts only: who took the photos is nobody's business in a file (Drive knows anyway).
-      const done = {
-        schema: 1,
-        photos: round.uploaded,
-        finished_at: this.now().toISOString(),
-        empty: round.empty ?? [], // doors reported empty, without a photo
-      };
-      const blob = new Blob([JSON.stringify(done)], { type: "application/json" });
-      await this.drive.uploadFile(DONE_FILE, blob, round.folderId);
-    }
+    // Counts only: who took the photos is nobody's business in a file (Drive knows anyway).
+    const done = {
+      schema: 1,
+      photos: round.uploaded,
+      finished_at: this.now().toISOString(),
+      empty: round.empty ?? [], // doors reported empty, without a photo
+    };
+    const blob = new Blob([JSON.stringify(done)], { type: "application/json" });
+    await this.drive.uploadFile(DONE_FILE, blob, round.folderId);
     await this.store.deleteRound(round.id);
   }
 }

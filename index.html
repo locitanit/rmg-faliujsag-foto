@@ -80,13 +80,16 @@
               minőségét: ha messze voltál vagy életlen lett, szól.
             </li>
             <li>
-              Ha nem volt hiba, akkor automatikusan feltöltődik a kép, és a státuszoknál jelzi,
-              hogy melyik részlet lett frissítve.
+              Ha jó, kiírja, mit ismert fel, és a <b>térképen kiszínezi</b>. Fotózz tovább a
+              Fotó gombbal.
             </li>
             <li>
-              Ha egy faliújságrészlet üres (pl. egy ajtóról lekerült minden papír), akkor nem
-              kell fotót készíteni róla, csak <b>koppints a státuszára</b>. Még egy koppintás
-              visszavonja.
+              Ha egy ajtó üres (lekerült róla minden papír), nem kell lefotózni: csak
+              <b>koppints rá a térképen</b>. Még egy koppintás visszavonja.
+            </li>
+            <li>
+              A végén nyomd meg a <b>Befejezés</b> gombot: akkor megy fel minden egyszerre,
+              és a térkép kiürül a következő fotózáshoz.
             </li>
             <li>
               A fotó nem kerül a telefon galériájába, és feltöltés után a telefonról azonnal
@@ -111,18 +114,20 @@
         </section>
 
         <p id="last" class="status ok"></p>
-        <p id="counts" class="counts"></p>
 
         <section class="box">
-          <b id="wall-title">Mi van már meg ebben a körben?</b>
+          <b id="wall-title">Ebben a körben</b>
           <div id="wall"></div>
           <ul class="legend small">
-            <li><span class="chip swatch have"></span>megvan</li>
-            <li><span class="chip swatch top"></span>csak a teteje</li>
-            <li><span class="chip swatch bottom"></span>csak az alja</li>
-            <li><span class="chip swatch empty"></span>üres</li>
+            <li><span class="piece swatch have"></span>megvan</li>
+            <li><span class="piece swatch top"></span>csak a teteje</li>
+            <li><span class="piece swatch bottom"></span>csak az alja</li>
+            <li><span class="piece swatch empty"></span>üres</li>
           </ul>
         </section>
+
+        <button id="finish" class="contained" type="button" disabled>Befejezés</button>
+        <p id="counts" class="counts"></p>
       </div>
 
       <p id="status" class="status" role="status" aria-live="polite"></p>

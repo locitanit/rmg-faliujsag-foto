@@ -20,7 +20,7 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
 ## Mit tud
 
 - **Képernyő:** sötét, az RMG Tools sötét módjának színeivel. Belépés előtt csak a belépő
-  doboz látszik; belépés után a leírás, a Fotó gomb és a pipalista. Fent három ikon:
+  doboz látszik; belépés után a leírás, a Fotó gomb, a fal térképe és a Befejezés gomb. Fent három ikon:
   **?** (a leírás ki-be, alapból csukva; a telefon megjegyzi), **telefon** (tipp a kezdőképernyőre tételhez),
   **fiók** (felugró menü, benne a Kijelentkezés).
 - Belépés iskolai Google-fiókkal (Google Identity Services; a token csak a memóriában él).
@@ -29,32 +29,36 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
   kimarad, pontosan ezzel a fiókkal lép be. (Azt, hogy a telefon melyik Chrome-profilban
   nyitja meg az oldalt, a weboldal nem tudja irányítani.) A `config.js` `hostedDomain`
   értékével a választó az iskola fiókjaira szűkíthető.
-- **Nincs „Kész" gomb, semmit nem kell lezárni.** Belépés után minden fotó azonnal felmegy.
-  A kör magától lezárul 30 másodperccel az utolsó fotó / koppintás után (akkor megy fel a
-  `done.json`), és ha ez elmaradna (bezárt app, nincs net), a feldolgozó 3 perc csend után
-  így is beolvassa a mappa fotóit. Belépni óránként egyszer kell (a böngésző csak
-  koppintásra enged belépő ablakot nyitni).
-- **Fotó** gomb → a telefon kamerája, teljes felbontás. A kép nem kerül a galériába.
-- A fotó előbb a telefonon vár (IndexedDB), aztán felmegy, és a telefonról törlődik.
-  Net nélkül sem vész el: magától újrapróbálja (30 mp-enként, és amikor visszajön a net).
+- **Egy fotózás = egy kör, a végén „Befejezés".** A kör fotói a telefonon gyűlnek
+  (IndexedDB); a **Befejezés** gomb küldi fel őket egyszerre, a végén a `done.json`-nal, így a
+  feldolgozó egyben kapja a kört. Ha a gomb elmarad, a kör 15 perc csend után magától
+  lezárul (vagy az app következő megnyitásakor). Belépni óránként egyszer kell (a böngésző
+  csak koppintásra enged belépő ablakot nyitni).
+- **Fotó** gomb → a telefon saját kamerája, teljes felbontás (fotónként a „Fotó használata"
+  koppintás marad – az appba épített kamerát a felhasználó nem kérte: rosszabb kép, nincs
+  saját fókusz / HDR). A kép nem kerül a galériába.
+- Feltöltés után a fotó a telefonról törlődik. Net nélkül sem vész el: magától
+  újrapróbálja (30 mp-enként, és amikor visszajön a net).
 - **Minden fotót megnéz a telefonon** (semmi nem megy ki hozzá): megkeresi rajta az
   ArUco-matricákat, és
-  - kipipálja a listán, mit mutat (ajtó, oldalfal, vagy a parafatábla egy darabja) – ajtónál és
+  - kiírja, mit ismert fel („✓ Felismertem: …"), és kiszínezi a térképen, mit mutat (ajtó, oldalfal, vagy a parafatábla egy darabja) – ajtónál és
     oldalfalnál a feldolgozó szabályával: mindkét matrica-oszlopából legalább 2–2 matrica; a
     tábla darabja a felső vagy alsó szél két szomszédos matricája közti sáv, mindkettő kell
     (a feldolgozónak a tábla bármely 2 matricája elég);
   - szól, ha **nincs elég matrica**, ha **túl messziről** készült (3,5 px/mm alatt), vagy ha
     **életlen**. Ilyenkor választani lehet: „Újra fotózom" (a kép eldobva) vagy „Így is jó".
   Ez csak tanács: ha az ellenőrzés nem sikerül, a fotó akkor is megmarad.
-- **Pipalista:** a fal 27 része balról jobbra: 2 × 6 ajtó, az **oldalfal**, a nagy tábla 8 darabja
-  (felső sor 1–4, alsó sor 1–4: #48–49, 49–50, …) és a kis tábla 6 darabja (#60–61, …). A pipák
-  **egész nap** megmaradnak (a körök közben a háttérben lezárulnak), másnap tiszta lappal indul.
+- **A fal térképe:** a fal 27 része nagyjából méretarányosan – fent a bal és a jobb szekrénysor
+  (6–6 ajtó) és az oldalfal, alatta (ugyanakkora léptékben) a nagy tábla 8 darabja (felső sor
+  1–4, alsó sor 1–4) és a kis tábla 6 darabja. A méretek a `zones.json`-ból jönnek
+  (`layout.js`: `size`, `box` mm-ben). A legutóbbi fotón felismert rész keretet kap. A térkép
+  **csak az aktuális kört** mutatja: Befejezés után kiürül.
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó
-  **teteje** (a csempe felül zöld); alsó + középső = az **alja** (alul zöld). A kettő együtt (vagy
+  **teteje** (a térképen felül zöld); alsó + középső = az **alja** (alul zöld). A kettő együtt (vagy
   egy egész-ajtós fotó) adja a pipát. Az oldalfal ugyanígy. A parafatábla darabja mindig egészben számít.
 - **Üres ajtó fotó nélkül:** ha egy szekrényajtóról (vagy az oldalfalról) minden lekerült, a listán a számára
-  koppintva „üres"-nek jelölhető (még egy koppintás visszavonja). A csempe mérete nem
-  változik: szaggatott keretet és áthúzást kap. A feldolgozó ilyenkor az
+  a térképen rá koppintva „üres"-nek jelölhető (még egy koppintás visszavonja): szaggatott
+  keretet és X-et kap, és a Befejezéssel megy el. A feldolgozó ilyenkor az
   ajtó papírjait fotó nélkül „lekerült"-re állítja. Ha ugyanarról az ajtóról fotó is készül
   a körben, a fotó számít. Parafatáblán nincs ilyen.
 - A kör végén `done.json` megy a kör mappájába: darabszám, időpont, és az üresnek jelölt
@@ -79,14 +83,14 @@ létre tudott hozni mappát a közös meghajtó `bejovo` mappájában (2026-10-0
 
 ### Ha változik a fal leírása
 
-A matricák kódjai (`dictionary.js`), a pipalista (`layout.js`) és a tesztképek az RMG Tools
+A matricák kódjai (`dictionary.js`), a fal térképe (`layout.js`) és a tesztképek az RMG Tools
 `zones.json`-jából készülnek. Ha ott új zóna vagy más szótár lesz, futtasd újra:
 
 ```bash
 C:/Loci/prog/rmg_tools/core/.venv/Scripts/python tools/make_data.py C:/Loci/prog/rmg_tools/core
 ```
 
-(Az oszloptávolságok átírása miatt nem kell: a webapp csak azt nézi, melyik matrica látszik.)
+(Oszloptávolság vagy táblaméret változásakor is futtasd: a térkép ezekből rajzol.)
 A két küszöb (`MIN_PX_PER_MM`, `MIN_SHARPNESS`) a `check.js` elején van – valódi fotók
 alapján érdemes lehet hangolni.
 
@@ -112,11 +116,11 @@ python -m http.server 8765
 | `config.js` | a két beállítandó érték + a kért engedély |
 | `auth.js` | Google-belépés |
 | `drive.js` | mappa létrehozása, feltöltés; időkorlát, újrapróbálás, magyar hibaüzenetek |
-| `rounds.js` | kör (magától záródik), várakozó sor, `done.json`, a nap pipái |
+| `rounds.js` | kör (Befejezés, vagy 15 perc csend után magától), várakozó sor, `done.json`, a kör térképjelei |
 | `aruco.js` | saját, függőség nélküli ArUco-kereső + élességmérés |
 | `check.js` | mit mutat a fotó, elég közeli-e, éles-e (a figyelmeztetések szövege) |
 | `photo.js` | a fotó megnyitása a böngészőben az ellenőrzéshez |
-| `dictionary.js`, `layout.js` | **generált** (`tools/make_data.py`): matricakódok, pipalista |
+| `dictionary.js`, `layout.js` | **generált** (`tools/make_data.py`): matricakódok, a fal részei és méretei |
 | `store.js` | a várakozó sor a telefonon (IndexedDB) |
 | `app.js`, `index.html`, `style.css` | a képernyő |
 | `sw.js`, `manifest.webmanifest`, `icons/` | PWA |
