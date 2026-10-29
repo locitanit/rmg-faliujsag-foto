@@ -174,7 +174,7 @@ export function judge({ markers, sharpness, groups }) {
     if (far && !onlyWhole) {
       warnings.push({
         code: "too-far",
-        text: "Túl messziről készült, az apró betű nem lesz olvasható. Menj közelebb: egy fotó = egy ajtó.",
+        text: "Túl messziről készült, az apró betű nem lesz olvasható. Menj közelebb: egy fotó = egy fél ajtó, vagy a tábla egy darabja.",
       });
     }
     if (sharpness !== null && sharpness < MIN_SHARPNESS) {
