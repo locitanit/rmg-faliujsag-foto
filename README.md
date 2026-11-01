@@ -62,7 +62,7 @@ belépést. A teljes állapot és a teendők: `rmg_tools/docs/faliujsag-plugin-t
   **csak az aktuális kört** mutatja: Befejezés után kiürül.
 - **Ajtó két fotóból:** ha egy fotón csak a felső + középső matricák látszanak, az az ajtó
   **teteje** (a térképen felül zöld); alsó + középső = az **alja** (alul zöld). A kettő együtt (vagy
-  egy egész-ajtós fotó) adja a pipát. Az oldalfal ugyanígy. A parafatábla darabja mindig egészben számít. **Ajánlott a két fél fotó** (élesebb): a feldolgozó az ajtó képét is két fix darabból, a felső és az alsó feléből rakja össze, a középső matricasornál vágva és a középső matricák sarkaihoz illesztve (RMG Tools, `board_worker/doors.py`, 2026-10-29). Ajtóhoz távoli fotó nem kell; táblához igen.
+  egy egész-ajtós fotó) adja a pipát. Az oldalfal ugyanígy. A parafatábla darabja mindig egészben számít. **Ajánlott a két fél fotó** (élesebb): a feldolgozó az ajtó képét is két fix darabból, a felső és az alsó feléből rakja össze, a középső matricasornál vágva és a középső matricák sarkaihoz illesztve (RMG Tools, `board_worker/doors.py`, 2026-10-29). Ajtóhoz távoli fotó nem kell; táblához igen. **Táblánál elég a változott csempe + a távoli fotó**: a többi csempén megmarad a korábbi éles kép (`SHARPER_OLD`), a távoli fotóból csak az ott talált új vagy cserélt papír kerül a képre.
 - **Üres ajtó fotó nélkül:** ha egy szekrényajtóról (vagy az oldalfalról) minden lekerült, a listán a számára
   a térképen rá koppintva „üres"-nek jelölhető (még egy koppintás visszavonja): szaggatott
   keretet és X-et kap, és a Befejezéssel megy el. A feldolgozó ilyenkor az
