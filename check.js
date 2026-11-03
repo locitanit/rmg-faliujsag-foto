@@ -164,7 +164,19 @@ export function judge({ markers, sharpness, groups }) {
       text: "Nem látok matricát a képen. Úgy fotózz, hogy az ajtó két szélén lévő matricák is rajta legyenek.",
     });
   } else {
-    if (items.length === 0) {
+    // Where the boards meet, both have stickers side by side: two stickers may be seen, yet
+    // one of each board, and neither board can be fitted with one.
+    const places = new Map();
+    for (const item of allItems(groups)) {
+      for (const id of itemStickers(item)) places.set(id, item.groupName);
+    }
+    const seenPlaces = [...new Set(ours.map((marker) => places.get(marker.id)))];
+    if (items.length === 0 && seenPlaces.length > 1) {
+      warnings.push({
+        code: "split",
+        text: `${ours.length} matricát látok, de ezek különböző helyekről valók (${seenPlaces.join(", ")}). Egy helyről legalább 2 kell: fordulj egy kicsit az egyik felé, hogy annak 2 szomszédos matricája legyen a képen.`,
+      });
+    } else if (items.length === 0) {
       warnings.push({
         code: "too-few",
         text: `Csak ${ours.length} matricát látok. Egy ajtóhoz mindkét oldaláról legalább 2–2 kell, a parafatáblánál a szélén 2 szomszédos.`,

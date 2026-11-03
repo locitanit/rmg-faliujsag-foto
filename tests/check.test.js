@@ -83,6 +83,18 @@ test("no sticker at all, or too few for anything, is a warning", () => {
   assert.match(few.warnings[0].text, /3 matric/);
 });
 
+test("one sticker of each board is not enough for either, and the warning says why", () => {
+  // 62: the big board's right edge, 71: the small board's left edge – side by side.
+  const split = judged([62, 71]);
+  assert.deepEqual(split.items, []);
+  assert.deepEqual(split.warnings.map((w) => w.code), ["split"]);
+  assert.match(split.warnings[0].text, /Nagy parafatábla, Kis parafatábla/);
+  // Two of one board are enough; the other board's sticker beside them does no harm.
+  const fine = judged([64, 65, 71]);
+  assert.deepEqual(fine.items, ["parafa-2-felso-2"]);
+  assert.deepEqual(fine.warnings, []);
+});
+
 test("stickers this app does not know are not counted", () => {
   assert.deepEqual(judged([90, 91, 92, 93]).warnings.map((w) => w.code), ["no-markers"]);
   // 73 and up are printed on the sheets but not used on the wall.
