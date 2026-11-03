@@ -3,12 +3,12 @@
 // Nothing leaves the phone here, and nothing is logged.
 
 import { detectMarkers, sharpness } from "./aruco.js";
-import { judge } from "./check.js";
+import { judge, photoSharpness } from "./check.js";
 import { DICTIONARY } from "./dictionary.js";
 import { GROUPS } from "./layout.js";
 
 const SEARCH_SIDE = 1400; // the longer side of the copy the stickers are searched on
-const SHARPNESS_SAMPLES = 3;
+const SHARPNESS_SAMPLES = 6;
 const MAX_CROP_SIDE = 600;
 
 function loadImage(file) {
@@ -59,9 +59,9 @@ export async function inspect(file) {
     corners: marker.corners.map(([x, y]) => [x / shrink, y / shrink]),
   }));
 
-  // Sharpness: on the photo's own pixels, around the biggest stickers; the best one counts
-  // (a sticker at the edge may be soft while the papers in the middle are fine).
-  let best = null;
+  // Sharpness: on the photo's own pixels, around the stickers (they sit at the edges, so a
+  // soft corner shows on them); check.photoSharpness makes one number of them.
+  const scores = [];
   const biggest = [...markers].sort((a, b) => b.side - a.side).slice(0, SHARPNESS_SAMPLES);
   for (const marker of biggest) {
     const xs = marker.corners.map((corner) => corner[0]);
@@ -74,9 +74,8 @@ export async function inspect(file) {
     const cw = x1 - x0;
     const ch = y1 - y0;
     if (cw < 8 || ch < 8 || Math.max(cw, ch) > MAX_CROP_SIDE) continue;
-    const score = sharpness(grayOf(image, x0, y0, cw, ch, cw, ch), cw, ch);
-    best = best === null ? score : Math.max(best, score);
+    scores.push(sharpness(grayOf(image, x0, y0, cw, ch, cw, ch), cw, ch));
   }
 
-  return judge({ markers, sharpness: best, groups: GROUPS });
+  return judge({ markers, sharpness: photoSharpness(scores), groups: GROUPS });
 }

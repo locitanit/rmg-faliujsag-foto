@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { MIN_PX_PER_MM, MIN_SHARPNESS, allItems, coveredItems, judge } from "../check.js";
+import { MIN_PX_PER_MM, MIN_SHARPNESS, allItems, coveredItems, judge, photoSharpness } from "../check.js";
 import * as checkModule from "../check.js";
 import { GROUPS } from "../layout.js";
 
@@ -111,6 +111,14 @@ test("small stickers mean the photo was taken from too far", () => {
   assert.deepEqual(far.items, ["sor-1-ajto-1"]);
   assert.deepEqual(far.warnings.map((w) => w.code), ["too-far"]);
   assert.match(far.warnings[0].text, /közelebb/);
+});
+
+test("the photo is as sharp as its weakest sticker; with 4 or more one is forgiven", () => {
+  assert.equal(photoSharpness([]), null);
+  assert.equal(photoSharpness([0.4, 0.1]), 0.1);
+  assert.equal(photoSharpness([0.4, 0.3, 0.1]), 0.1);
+  assert.equal(photoSharpness([0.4, 0.05, 0.3, 0.35]), 0.3);
+  assert.equal(photoSharpness([0.4, 0.05, 0.08, 0.35, 0.3, 0.4]), 0.08);
 });
 
 test("a blurred photo is a warning; an unknown sharpness is not", () => {

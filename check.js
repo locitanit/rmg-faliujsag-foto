@@ -17,6 +17,17 @@ export const MIN_PX_PER_MM = 3.5;
 // spread over 3 pixels or more of the full-size photo.
 export const MIN_SHARPNESS = 0.13;
 
+/**
+ * One sharpness for the photo from its stickers' scores (null: none could be measured). The
+ * weakest counts – a soft corner means soft papers there too –, but with 4 or more one
+ * weak sticker is forgiven (a single bad crop, a sticker half hidden).
+ */
+export function photoSharpness(scores) {
+  if (scores.length === 0) return null;
+  const sorted = [...scores].sort((a, b) => a - b);
+  return sorted[sorted.length >= 4 ? 1 : 0];
+}
+
 export function allItems(groups) {
   return groups.flatMap((group) =>
     group.items.map((item) => ({ ...item, groupId: group.id, groupName: group.name })),
@@ -124,7 +135,7 @@ export function missingFarPhotos(marks, groups) {
 
 /**
  * markers: from aruco.detectMarkers, `side` in pixels of the FULL-SIZE photo.
- * sharpness: aruco.sharpness of the sharpest sticker, or null when it could not be measured.
+ * sharpness: photoSharpness of the stickers, or null when it could not be measured.
  */
 export function judge({ markers, sharpness, groups }) {
   const known = new Set(allItems(groups).flatMap(itemStickers));
