@@ -15,6 +15,8 @@ const RETRY_EVERY_MS = 30_000;
 // photo / tap (and when the app is opened again later).
 const IDLE_CLOSE_MS = 15 * 60_000;
 const IDLE_CHECK_MS = 30_000;
+// A web app uploads only while it is in front: another app or the screen lock stops it.
+const KEEP_OPEN = "Tartsd nyitva az appot, és ne zárd le a telefont, amíg ki nem írja: „Elküldve”.";
 const $ = (id) => document.getElementById(id);
 const configured = Boolean(CONFIG.clientId && CONFIG.inboxFolderId);
 
@@ -234,6 +236,7 @@ async function render() {
   if (!signedIn) {
     closeProfileMenu();
     if ($("install-dialog").open) $("install-dialog").close();
+    if ($("help").open) $("help").close();
   }
   renderWall(status.marks, status.empty);
   $("finish").disabled = status.taken + status.empty.length === 0;
@@ -241,7 +244,7 @@ async function render() {
     ? `Befejezés – ${status.taken} fotó elküldése`
     : status.empty.length ? "Befejezés – elküldés" : "Befejezés";
   $("counts").textContent = status.waiting
-    ? `${status.waiting} fotó vár feltöltésre a telefonon`
+    ? `${status.waiting} fotó vár feltöltésre a telefonon. ${KEEP_OPEN}`
     : "";
   return status;
 }
@@ -249,7 +252,7 @@ async function render() {
 async function sync() {
   const before = await render();
   if (!configured || (before.waiting === 0 && !before.closing)) return;
-  if (auth.signedIn()) say("Feltöltés…");
+  if (auth.signedIn()) say(`Feltöltés… ${KEEP_OPEN}`);
   const result = await rounds.pump();
   const after = await render();
   if (result.state === "signin") {
@@ -347,39 +350,27 @@ document.addEventListener(
   }),
 );
 
-// The top bar: instructions (closed until asked for; this phone remembers), the
-// home-screen tip, and the account menu with "Kijelentkezés".
-const HELP_KEY = "faliujsag-foto.help";
-
-function showHelp(open) {
-  $("help").hidden = !open;
-  $("help-button").setAttribute("aria-expanded", String(open));
-}
-
+// The top bar: instructions and the home-screen tip (both pop-ups, opened by their icon),
+// and the account menu with "Kijelentkezés".
 function closeProfileMenu() {
   $("profile-menu").hidden = true;
   $("profile-button").setAttribute("aria-expanded", "false");
 }
 
-$("help-button").addEventListener("click", () => {
-  const open = $("help").hidden;
-  showHelp(open);
-  try {
-    localStorage.setItem(HELP_KEY, open ? "on" : "off");
-  } catch {
-    // private mode: closed again next time, nothing else is lost
-  }
-  if (open) $("help").scrollIntoView({ behavior: "smooth", block: "nearest" });
-});
-
-$("install-button").addEventListener("click", () => {
-  closeProfileMenu();
-  $("install-dialog").showModal();
-});
-$("install-close").addEventListener("click", () => $("install-dialog").close());
-$("install-dialog").addEventListener("click", (event) => {
-  if (event.target === $("install-dialog")) $("install-dialog").close(); // a tap beside it
-});
+for (const [button, dialog, close] of [
+  ["help-button", "help", "help-close"],
+  ["install-button", "install-dialog", "install-close"],
+]) {
+  $(button).addEventListener("click", () => {
+    closeProfileMenu();
+    $(dialog).showModal();
+    $(dialog).scrollTop = 0;
+  });
+  $(close).addEventListener("click", () => $(dialog).close());
+  $(dialog).addEventListener("click", (event) => {
+    if (event.target === $(dialog)) $(dialog).close(); // a tap beside it
+  });
+}
 
 $("profile-button").addEventListener("click", () => {
   const open = $("profile-menu").hidden;
@@ -419,9 +410,9 @@ if ("serviceWorker" in navigator) {
 
 $("hint").value = savedHint();
 try {
-  showHelp(localStorage.getItem(HELP_KEY) === "on");
+  localStorage.removeItem("faliujsag-foto.help"); // the old "instructions open" switch
 } catch {
-  showHelp(false);
+  // private mode: nothing was stored
 }
 
 guard(async () => {

@@ -59,13 +59,13 @@
                spellcheck="false" placeholder="nev@iskola.hu" />
         <button id="signin" class="contained">Belépés az iskolai Google-fiókkal</button>
         <p class="small">
-          Lépj be egyszer az elején – utána minden fotó magától felmegy.
+          Lépj be egyszer az elején – utána a fotók maguktól felmennek, amíg az app nyitva van.
         </p>
       </section>
 
       <div id="app-view" class="stack" hidden>
-        <section id="help" class="box hint">
-          <b>Így fotózz</b>
+        <dialog id="help" class="dialog help-dialog" aria-labelledby="help-title">
+          <b id="help-title">Így fotózz</b>
           <ol>
             <li>
               <b>Ajtó: két közeli fotó</b> – egy a felső felére, egy az alsóra, hogy éles
@@ -101,11 +101,19 @@
               és a térkép kiürül a következő fotózáshoz.
             </li>
             <li>
+              <b>Feltöltés közben tartsd nyitva az appot</b>, és ne zárd le a telefont, amíg
+              ki nem írja: „Elküldve”. Ha másik appra váltasz vagy lezár a képernyő, a
+              feltöltés megáll – nem vész el semmi, az app következő megnyitásakor folytatódik.
+            </li>
+            <li>
               A fotó nem kerül a telefon galériájába, és feltöltés után a telefonról azonnal
               törlődik. Csak az iskolai Google Drive-ra megy.
             </li>
           </ol>
-        </section>
+          <div class="dialog-actions">
+            <button id="help-close" class="text-button" type="button">Rendben</button>
+          </div>
+        </dialog>
 
         <label id="shoot" class="primary">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
